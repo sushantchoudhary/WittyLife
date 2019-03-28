@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout android:layout_height="wrap_content"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent" android:orientation="vertical">
+    <ImageView android:layout_height="0dp"
+               android:layout_weight="1"
+               android:layout_width="match_parent"
+               android:adjustViewBounds="true"
+               android:scaleType="fitCenter"
+               android:contentDescription="@string/destination_item_description"
+    android:id="@+id/destination_item">
+    </ImageView>
+</LinearLayout>

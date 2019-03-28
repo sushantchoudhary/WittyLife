@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:id="@+id/witty_life_scrollview"
+            android:fillViewport="true">
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="sans-serif"
+        android:gravity="start|center_horizontal"
+        android:text="@string/goal"
+        android:textAlignment="center"
+        android:textSize="28sp"
+        style="@style/Base.TextAppearance.AppCompat.Headline"
+        app:layout_constraintBottom_toTopOf="@+id/ranking"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <!--<android.support.v7.widget.RecyclerView-->
+    <!--android:id="@+id/ranking"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="85dp"-->
+    <!--android:layout_margin="20dp"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:layout_marginEnd="8dp"-->
+    <!--android:layout_marginStart="8dp"-->
+    <!--app:layout_constraintBottom_toTopOf="@+id/populardestination"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintHorizontal_bias="0.0"-->
+    <!--app:layout_constraintStart_toStartOf="parent"/>-->
+
+    <LinearLayout
+        android:id="@+id/ranking"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/goal"
+    android:orientation="horizontal">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:id="@+id/qolcard"
+            app:cardCornerRadius="5dp"
+        >
+            <ImageView
+                android:id="@+id/qolranking"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/qolranking"
+                android:elevation="5dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/larmrmah216854unsplash"/>
+
+            <!--<Space-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="160dp"-->
+                <!--android:id="@+id/space_view"-->
+            <!--/>-->
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:id="@+id/costcard"
+            app:cardCornerRadius="5dp"
+        >
+        <ImageView
+            android:id="@+id/costofliving"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/costofliving"
+            android:elevation="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/mirzababic766502unsplash"
+        />
+
+            <!--<Space-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="160dp"-->
+                <!--android:id="@+id/cost_space_view"-->
+            <!--/>-->
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:id="@+id/traffic_card"
+            app:cardCornerRadius="5dp"
+        >
+
+        <ImageView android:id="@+id/traffic"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent"
+                   android:layout_margin="8dp"
+                   android:layout_weight="1"
+                   android:adjustViewBounds="true"
+                   android:contentDescription="@string/traffic"
+                   android:elevation="5dp"
+                   android:scaleType="centerInside"
+                   android:src="@drawable/adamsherez258833unsplash"
+        />
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/populardest_text"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="12dp"
+        android:fontFamily="sans-serif"
+        android:gravity="start|center_horizontal"
+        android:text="@string/popular_dest_text"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ranking"
+    />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_populardestination"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_margin="20dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_error_message_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/error_message"
+        android:textSize="20sp"
+        android:visibility="invisible"/>
+
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+</android.support.constraint.ConstraintLayout>
+
+</ScrollView>
+
+

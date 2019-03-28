@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">WittyLife</string>
+    <string name="search_title">Search for your destination</string>
+    <string name="search_hint">Search destination</string>
+    <string name="goal">What can we help you find?</string>
+    <string name="popular_dest_text">Popular destinations</string>
+
+
+
+    <string name="error_message">An error has occurred. Please try again.</string>
+    <string name="costofliving">costofliving</string>
+    <string name="traffic">traffic</string>
+    <string name="qolranking">qolranking</string>
+    <string name="destination_item_description">Destination item</string>
+
+</resources>

@@ -1,11 +1,16 @@
 package com.appdev.schoudhary.wittylife.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-
+@Entity(tableName = "qolranking")
 public class QOLRanking implements Parcelable {
 
     @SerializedName("country")
@@ -40,6 +45,8 @@ public class QOLRanking implements Parcelable {
     private Double safetyIndex;
     @SerializedName("city_id")
     @Expose
+    @PrimaryKey
+    @ColumnInfo(name = "city_id")
     private Integer cityId;
     @SerializedName("cpi_index")
     @Expose
@@ -61,6 +68,7 @@ public class QOLRanking implements Parcelable {
 
     };
 
+    @Ignore
     private QOLRanking(Parcel in) {
         this.country = ((String) in.readValue((String.class.getClassLoader())));
         this.trafficTimeIndex = ((Double) in.readValue((Double.class.getClassLoader())));
@@ -76,11 +84,11 @@ public class QOLRanking implements Parcelable {
         this.cpiIndex = ((Double) in.readValue((Double.class.getClassLoader())));
     }
 
-    /**
-     * No args constructor for use in serialization
-     */
-    public QOLRanking() {
-    }
+//    /**
+//     * No args constructor for use in serialization
+//     */
+//    public QOLRanking() {
+//    }
 
     /**
      * @param healthcareIndex

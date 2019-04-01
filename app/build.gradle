@@ -11,10 +11,26 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField 'String', "ApiKey", Numbeo_ApiKey
+            resValue 'string', "api_key", Numbeo_ApiKey
+            buildConfigField 'String', "UnsplashApiKey", Unsplash_ApiKey
+            resValue 'string', "unsplash_api_key", Unsplash_ApiKey
+            Unsplash_ApiKey
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField 'String', "ApiKey", Numbeo_ApiKey
+            resValue 'string', "api_key", Numbeo_ApiKey
+            buildConfigField 'String', "UnsplashApiKey", Unsplash_ApiKey
+            resValue 'string', "unsplash_api_key", Unsplash_ApiKey
         }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
     }
 }
 
@@ -51,4 +67,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.4'
 
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
+
+    implementation 'com.github.jakob-grabner:Circle-Progress-View:1.4'
+
 }

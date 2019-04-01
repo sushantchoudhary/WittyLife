@@ -1,10 +1,16 @@
 package com.appdev.schoudhary.wittylife.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "costranking")
 public class CostRanking implements Parcelable
 {
 
@@ -29,12 +35,6 @@ public class CostRanking implements Parcelable
     @SerializedName("groceries_index")
     @Expose
     private Double groceriesIndex;
-    @SerializedName("city_id")
-    @Expose
-    private Integer cityId;
-    @SerializedName("cpi_index")
-    @Expose
-    private Double cpiIndex;
     public final static Parcelable.Creator<CostRanking> CREATOR = new Creator<CostRanking>() {
 
 
@@ -49,9 +49,17 @@ public class CostRanking implements Parcelable
             return (new CostRanking[size]);
         }
 
-    }
-            ;
+    };
+    @SerializedName("cpi_index")
+    @Expose
+    private Double cpiIndex;
+    @SerializedName("city_id")
+    @Expose
+    @PrimaryKey
+    @ColumnInfo(name = "city_id")
+    private Integer cityId;
 
+    @Ignore
     private CostRanking(Parcel in) {
         this.country = ((String) in.readValue((String.class.getClassLoader())));
         this.cityName = ((String) in.readValue((String.class.getClassLoader())));
@@ -68,8 +76,8 @@ public class CostRanking implements Parcelable
      * No args constructor for use in serialization
      *
      */
-    public CostRanking() {
-    }
+//    public CostRanking() {
+//    }
 
     /**
      *

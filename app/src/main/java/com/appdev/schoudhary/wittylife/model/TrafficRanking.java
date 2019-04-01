@@ -1,12 +1,17 @@
 
 package com.appdev.schoudhary.wittylife.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "trafficranking")
 public class TrafficRanking implements Parcelable {
 
     @SerializedName("country")
@@ -32,6 +37,8 @@ public class TrafficRanking implements Parcelable {
     private Double co2EmissionIndex;
     @SerializedName("city_id")
     @Expose
+    @PrimaryKey
+    @ColumnInfo(name = "city_id")
     private Integer cityId;
     public final static Parcelable.Creator<TrafficRanking> CREATOR = new Creator<TrafficRanking>() {
 
@@ -49,7 +56,8 @@ public class TrafficRanking implements Parcelable {
 
     };
 
-    protected TrafficRanking(Parcel in) {
+    @Ignore
+    private TrafficRanking(Parcel in) {
         this.country = ((String) in.readValue((String.class.getClassLoader())));
         this.cityName = ((String) in.readValue((String.class.getClassLoader())));
         this.timeExpIndex = ((Double) in.readValue((Double.class.getClassLoader())));
@@ -63,8 +71,8 @@ public class TrafficRanking implements Parcelable {
     /**
      * No args constructor for use in serialization
      */
-    public TrafficRanking() {
-    }
+//    public TrafficRanking() {
+//    }
 
     /**
      * @param cityId

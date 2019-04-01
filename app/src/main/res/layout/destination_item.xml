@@ -2,13 +2,15 @@
 
 <LinearLayout android:layout_height="wrap_content"
               xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent" android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:orientation="vertical">
     <ImageView android:layout_height="0dp"
                android:layout_weight="1"
                android:layout_width="match_parent"
                android:adjustViewBounds="true"
-               android:scaleType="fitCenter"
+               android:scaleType="centerInside"
                android:contentDescription="@string/destination_item_description"
-    android:id="@+id/destination_item">
+    android:id="@+id/destination_item"
+    android:layout_margin="8dp">
     </ImageView>
 </LinearLayout>

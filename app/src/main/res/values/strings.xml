@@ -5,6 +5,9 @@
     <string name="goal">What can we help you find?</string>
     <string name="popular_dest_text">Popular destinations</string>
 
+    <string name="qol_message">Quailty of life</string>
+    <string name="cost_message">Cost of living</string>
+    <string name="traffic_message">Traffic Ranking</string>
 
 
     <string name="error_message">An error has occurred. Please try again.</string>
@@ -12,5 +15,13 @@
     <string name="traffic">traffic</string>
     <string name="qolranking">qolranking</string>
     <string name="destination_item_description">Destination item</string>
+    <string name="error_dismiss_button">Dismiss</string>
+    <string name="network_error">W00t, something failed</string>
+    <string name="network_error_msg">Please check network connection and try again</string>
+    <string name="qol_header">Quality of life Index</string>
+    <string name="purchasing_power_text">Purchasing Power Index</string>
+    <string name="safety_text">Safety Index</string>
+    <string name="health_text">Health Care Index</string>
+    <string name="climate_text">Climate Index</string>
 
 </resources>

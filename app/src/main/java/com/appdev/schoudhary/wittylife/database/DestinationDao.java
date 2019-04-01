@@ -1,0 +1,40 @@
+package com.appdev.schoudhary.wittylife.database;
+
+
+import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
+
+import com.appdev.schoudhary.wittylife.model.QOLRanking;
+import com.appdev.schoudhary.wittylife.model.Result;
+
+import java.util.List;
+
+@Dao
+public interface DestinationDao {
+
+    @Query("SELECT * FROM destination_result")
+    LiveData<List<Result>> loadAllImages();
+
+    @Query("DELETE FROM destination_result")
+    void deleteAllRows();
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertDestination(Result result);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    List<Long> insertDestinationList(List<Result> destinationRecords);
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void updateDestination(Result result);
+
+    @Delete
+    void deleteDestination(Result result);
+
+    @Query("SELECT * FROM destination_result WHERE  unsplash_id= :id")
+    LiveData<Result> loadResultById(int id);
+}

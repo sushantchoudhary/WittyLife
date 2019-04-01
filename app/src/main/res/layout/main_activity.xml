@@ -1,192 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+<ScrollView android:id="@+id/witty_life_scrollview"
             xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:id="@+id/witty_life_scrollview"
+            android:layout_height="match_parent"
             android:fillViewport="true">
 
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    tools:context=".MainActivity">
-    <TextView
-        android:id="@+id/goal"
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:fontFamily="sans-serif"
-        android:gravity="start|center_horizontal"
-        android:text="@string/goal"
-        android:textAlignment="center"
-        android:textSize="28sp"
-        style="@style/Base.TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="@+id/ranking"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"/>
-
-    <!--<android.support.v7.widget.RecyclerView-->
-    <!--android:id="@+id/ranking"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="85dp"-->
-    <!--android:layout_margin="20dp"-->
-    <!--android:layout_marginBottom="30dp"-->
-    <!--android:layout_marginEnd="8dp"-->
-    <!--android:layout_marginStart="8dp"-->
-    <!--app:layout_constraintBottom_toTopOf="@+id/populardestination"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintHorizontal_bias="0.0"-->
-    <!--app:layout_constraintStart_toStartOf="parent"/>-->
-
-    <LinearLayout
-        android:id="@+id/ranking"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/goal"
-    android:orientation="horizontal">
-
-        <android.support.v7.widget.CardView
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:id="@+id/qolcard"
-            app:cardCornerRadius="5dp"
-        >
-            <ImageView
-                android:id="@+id/qolranking"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/qolranking"
-                android:elevation="5dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/larmrmah216854unsplash"/>
-
-            <!--<Space-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="160dp"-->
-                <!--android:id="@+id/space_view"-->
-            <!--/>-->
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:id="@+id/costcard"
-            app:cardCornerRadius="5dp"
-        >
-        <ImageView
-            android:id="@+id/costofliving"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        tools:context=".ui.main.MainActivity">
+        <TextView
+            android:id="@+id/goal"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/costofliving"
-            android:elevation="5dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/mirzababic766502unsplash"
-        />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_horizontal"
+            android:text="@string/goal"
+            android:textSize="22sp"
+            app:layout_constraintBottom_toTopOf="@+id/ranking_scrollview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"/>
 
-            <!--<Space-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="160dp"-->
-                <!--android:id="@+id/cost_space_view"-->
-            <!--/>-->
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:layout_margin="20dp"
-            android:id="@+id/traffic_card"
-            app:cardCornerRadius="5dp"
+        <HorizontalScrollView android:id="@+id/ranking_scrollview"
+                              xmlns:android="http://schemas.android.com/apk/res/android"
+                              xmlns:app="http://schemas.android.com/apk/res-auto"
+                              xmlns:tools="http://schemas.android.com/tools"
+                              android:layout_width="match_parent"
+                              android:layout_height="160dp"
+                              android:layout_marginBottom="8dp"
+                              android:layout_marginEnd="8dp"
+                              android:layout_marginStart="8dp"
+                              android:layout_marginTop="8dp"
+                              android:orientation="horizontal"
+                              android:scrollbarStyle="outsideInset"
+                              android:scrollbars="none"
+                              app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
+                              app:layout_constraintEnd_toEndOf="parent"
+                              app:layout_constraintHorizontal_bias="1.0"
+                              app:layout_constraintStart_toStartOf="parent"
+                              app:layout_constraintTop_toBottomOf="@id/goal"
         >
 
-        <ImageView android:id="@+id/traffic"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent"
-                   android:layout_margin="8dp"
-                   android:layout_weight="1"
-                   android:adjustViewBounds="true"
-                   android:contentDescription="@string/traffic"
-                   android:elevation="5dp"
-                   android:scaleType="centerInside"
-                   android:src="@drawable/adamsherez258833unsplash"
+            <LinearLayout
+                android:id="@+id/ranking"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/qolcard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="20dp"
+                    app:cardCornerRadius="10dp"
+                >
+                    <LinearLayout android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:orientation="vertical">
+                        <ImageView
+                            android:id="@+id/qolranking"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_weight="1"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/qolranking"
+                            android:elevation="5dp"
+                            android:scaleType="fitXY"
+                        />
+
+                        <TextView
+                            style="@style/Base.TextAppearance.AppCompat.Body2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="start|center_horizontal"
+                            android:text="@string/qol_message"
+                            android:textAlignment="center"
+                            android:textSize="12sp"
+                        />
+
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/costcard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="20dp"
+                    app:cardCornerRadius="10dp"
+                >
+                    <LinearLayout android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:orientation="vertical">
+                        <ImageView
+                            android:id="@+id/costofliving"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_marginBottom="16dp"
+                            android:layout_weight="1"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/costofliving"
+                            android:elevation="5dp"
+                            android:scaleType="fitXY"
+
+                        />
+
+                        <TextView
+                            style="@style/Base.TextAppearance.AppCompat.Body2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="start|center_horizontal"
+                            android:text="@string/cost_message"
+                            android:textAlignment="center"
+                            android:textSize="12sp"
+
+                        />
+
+                    </LinearLayout>
+
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/traffic_card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="20dp"
+                    app:cardCornerRadius="10dp"
+                >
+
+                    <LinearLayout android:layout_width="match_parent"
+                                  android:layout_height="match_parent"
+                                  android:orientation="vertical">
+
+                        <ImageView android:id="@+id/traffic"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="0dp"
+                                   android:layout_marginBottom="16dp"
+                                   android:layout_weight="1"
+                                   android:adjustViewBounds="true"
+                                   android:contentDescription="@string/traffic"
+                                   android:elevation="5dp"
+                                   android:scaleType="fitXY"
+
+                        />
+
+                        <TextView
+                            style="@style/Base.TextAppearance.AppCompat.Body2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="start|center_horizontal"
+                            android:text="@string/traffic_message"
+                            android:textAlignment="center"
+                            android:textSize="12sp"
+
+                        />
+
+                    </LinearLayout>
+
+                </android.support.v7.widget.CardView>
+
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/tv_error_message_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/error_message"
+            android:textSize="20sp"
+            android:visibility="invisible" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/ranking_scrollview"
+            android:layout_marginBottom="45dp"
+            app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"/>
+
+        <ProgressBar
+            android:id="@+id/pb_loading_indicator"
+            android:layout_height="42dp"
+            android:layout_width="42dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="@+id/populardest_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+
         />
 
-        </android.support.v7.widget.CardView>
+        <TextView
+            android:id="@+id/populardest_text"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_horizontal"
+            android:text="@string/popular_dest_text"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ranking_scrollview"/>
 
-    </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_populardestination"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+        />
 
-    <TextView
-        android:id="@+id/populardest_text"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="12dp"
-        android:fontFamily="sans-serif"
-        android:gravity="start|center_horizontal"
-        android:text="@string/popular_dest_text"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/rv_populardestination"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ranking"
-    />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_populardestination"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_margin="20dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"/>
+    </android.support.constraint.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/tv_error_message_display"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/error_message"
-        android:textSize="20sp"
-        android:visibility="invisible"/>
-
-    <ProgressBar
-        android:id="@+id/pb_loading_indicator"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_gravity="center"
-        android:visibility="invisible"/>
-
-</android.support.constraint.ConstraintLayout>
 
 </ScrollView>
 

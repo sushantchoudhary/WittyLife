@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appdev.schoudhary.wittylife.R;
+import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 
 public class MainFragment extends Fragment {
 

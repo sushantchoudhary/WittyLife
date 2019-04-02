@@ -1,294 +1,379 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView android:id="@+id/witty_life_scrollview"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
+            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
 
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".ui.main.DetailsActivity">
-
-
-    <TextView
-        android:id="@+id/detail_header"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="wrap_content"
-        android:layout_height="21dp" android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp" android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/qol_header"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/tableLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.029" app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.837"/>
-    <View
-        android:id="@+id/detail_divider_main"
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background="#dadada"
-        app:layout_constraintBottom_toTopOf="@id/tableLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detail_header"/>
-
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginBottom="252dp" android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TableRow android:id="@+id/ppi_index_row"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_margin="8dp"
-        >
-            <TextView android:id="@+id/ppi_text"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:text="@string/purchasing_power_text"
-                      android:textAlignment="viewStart"
-                      android:textSize="16sp"
-                      android:layout_marginStart="8dp"
-                      android:layout_marginTop="15dp"
-            />
-
-            <TextView android:id="@+id/ppi_value"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAlignment="center"
-                      android:textSize="16sp"
-                      tools:text="120.00"
-                      android:layout_marginStart="12dp"
-                      android:layout_marginTop="15dp"
-            />
-
-            <at.grabner.circleprogress.CircleProgressView
-                android:id="@+id/ppiCircleView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="40dp"
-                CircleProgressView:cpv_autoTextSize="true"
-                CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_barWidth="35dp"
-                CircleProgressView:cpv_innerContourSize="0dp"
-                CircleProgressView:cpv_outerContourSize="0dp"
-                CircleProgressView:cpv_rimColor="@color/primary_light"
-                CircleProgressView:cpv_rimWidth="35dp"
-                CircleProgressView:cpv_seekMode="false"
-                CircleProgressView:cpv_showUnit="true"
-                CircleProgressView:cpv_spinColor="@color/primary_light"
-                CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_textScale="1"
-                CircleProgressView:cpv_unit="%"
-                CircleProgressView:cpv_unitColor="@color/primary_light"
-                CircleProgressView:cpv_unitPosition="right_top"
-                CircleProgressView:cpv_unitScale="1"
-                CircleProgressView:cpv_value="5" />
+        android:layout_height="wrap_content"
+        tools:context=".ui.main.DetailsActivity">
 
 
-        </TableRow>
-
+        <TextView
+            android:id="@+id/detail_header"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="21dp" android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp" android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/qol_header"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/tableLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.029"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.837"/>
         <View
-            android:id="@+id/detail_divider0"
+            android:id="@+id/detail_divider_main"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_margin="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:background="#dadada"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintBottom_toTopOf="@id/tableLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detail_header"/>
 
-        <TableRow android:id="@+id/safety_index_row" android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_margin="8dp"
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="252dp" android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-        >
-            <TextView android:id="@+id/safety_text"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/safety_text"
-                      android:textAlignment="viewStart"
-                      android:textSize="16sp"
-                      android:layout_marginStart="8dp"
-                      android:layout_marginTop="15dp"
-            />
+            <TableRow android:id="@+id/ppi_index_row"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_margin="8dp"
+            >
+                <TextView android:id="@+id/ppi_text"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginTop="15dp"
+                          android:text="@string/purchasing_power_text"
+                          android:textAlignment="viewStart"
+                          android:textSize="16sp"
+                />
 
-            <TextView android:id="@+id/safety_value"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAlignment="center"
-                      android:textSize="16sp"
-                      tools:text="120.00"
-                      android:layout_marginStart="12dp"
-                      android:layout_marginTop="15dp"
-            />
+                <TextView android:id="@+id/ppi_value"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="12dp"
+                          android:layout_marginTop="15dp"
+                          android:textAlignment="center"
+                          android:textSize="16sp"
+                          tools:text="120.00"
+                />
 
-            <at.grabner.circleprogress.CircleProgressView
-                android:id="@+id/safetyCircleView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="40dp"
-                CircleProgressView:cpv_autoTextSize="true"
-                CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_barWidth="35dp"
-                CircleProgressView:cpv_innerContourSize="0dp"
-                CircleProgressView:cpv_outerContourSize="0dp"
-                CircleProgressView:cpv_rimColor="@color/primary_light"
-                CircleProgressView:cpv_rimWidth="35dp"
-                CircleProgressView:cpv_seekMode="false"
-                CircleProgressView:cpv_showUnit="true"
-                CircleProgressView:cpv_spinColor="@color/primary_light"
-                CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_textScale="1"
-                CircleProgressView:cpv_unit="%"
-                CircleProgressView:cpv_unitColor="@color/primary_light"
-                CircleProgressView:cpv_unitPosition="right_top"
-                CircleProgressView:cpv_unitScale="1"
-                CircleProgressView:cpv_value="5" />
-        </TableRow>
+                <at.grabner.circleprogress.CircleProgressView
+                    android:id="@+id/ppiCircleView"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="40dp"
+                    CircleProgressView:cpv_autoTextSize="true"
+                    CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_barWidth="35dp"
+                    CircleProgressView:cpv_innerContourSize="0dp"
+                    CircleProgressView:cpv_outerContourSize="0dp"
+                    CircleProgressView:cpv_rimColor="@color/primary_light"
+                    CircleProgressView:cpv_rimWidth="35dp"
+                    CircleProgressView:cpv_seekMode="false"
+                    CircleProgressView:cpv_showUnit="true"
+                    CircleProgressView:cpv_spinColor="@color/primary_light"
+                    CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_textScale="1"
+                    CircleProgressView:cpv_unit="%"
+                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_unitPosition="right_top"
+                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_value="5"/>
+
+
+            </TableRow>
+
+            <View
+                android:id="@+id/detail_divider0"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:background="#dadada"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TableRow android:id="@+id/safety_index_row" android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_margin="8dp"
+
+            >
+                <TextView android:id="@+id/safety_text"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginTop="15dp"
+                          android:text="@string/safety_text"
+                          android:textAlignment="viewStart"
+                          android:textSize="16sp"
+                />
+
+                <TextView android:id="@+id/safety_value"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="12dp"
+                          android:layout_marginTop="15dp"
+                          android:textAlignment="center"
+                          android:textSize="16sp"
+                          tools:text="120.00"
+                />
+
+                <at.grabner.circleprogress.CircleProgressView
+                    android:id="@+id/safetyCircleView"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="40dp"
+                    CircleProgressView:cpv_autoTextSize="true"
+                    CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_barWidth="35dp"
+                    CircleProgressView:cpv_innerContourSize="0dp"
+                    CircleProgressView:cpv_outerContourSize="0dp"
+                    CircleProgressView:cpv_rimColor="@color/primary_light"
+                    CircleProgressView:cpv_rimWidth="35dp"
+                    CircleProgressView:cpv_seekMode="false"
+                    CircleProgressView:cpv_showUnit="true"
+                    CircleProgressView:cpv_spinColor="@color/primary_light"
+                    CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_textScale="1"
+                    CircleProgressView:cpv_unit="%"
+                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_unitPosition="right_top"
+                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_value="5"/>
+            </TableRow>
+
+            <View
+                android:id="@+id/detail_divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:background="#dadada"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TableRow android:id="@+id/healthcare_index_row" android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_margin="8dp">
+                <TextView android:id="@+id/health_text"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginTop="15dp"
+                          android:text="@string/health_text"
+                          android:textAlignment="viewStart"
+                          android:textSize="16sp"/>
+
+                <TextView android:id="@+id/healthcare_value"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginEnd="12dp"
+                          android:layout_marginStart="12dp"
+                          android:layout_marginTop="15dp"
+                          android:textAlignment="center"
+                          android:textSize="16sp"
+                          tools:text="120.00"/>
+
+                <at.grabner.circleprogress.CircleProgressView
+                    android:id="@+id/healthCircleView"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="40dp"
+                    CircleProgressView:cpv_autoTextSize="true"
+                    CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_barWidth="35dp"
+                    CircleProgressView:cpv_innerContourSize="0dp"
+                    CircleProgressView:cpv_outerContourSize="0dp"
+                    CircleProgressView:cpv_rimColor="@color/primary_light"
+                    CircleProgressView:cpv_rimWidth="35dp"
+                    CircleProgressView:cpv_seekMode="false"
+                    CircleProgressView:cpv_showUnit="true"
+                    CircleProgressView:cpv_spinColor="@color/primary_light"
+                    CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_textScale="1"
+                    CircleProgressView:cpv_unit="%"
+                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_unitPosition="right_top"
+                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_value="5"/>
+
+
+            </TableRow>
+
+            <View
+                android:id="@+id/detail_divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="8dp"
+                android:background="#dadada"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TableRow android:id="@+id/climate_index_row" android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_margin="8dp">
+                <TextView android:id="@+id/climate_text"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginTop="15dp"
+                          android:text="@string/climate_text"
+                          android:textAlignment="viewStart"
+                          android:textSize="16sp"/>
+
+
+                <TextView android:id="@+id/climate_value"
+                          style="@style/Base.TextAppearance.AppCompat.Headline"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginStart="12dp"
+                          android:layout_marginTop="15dp"
+                          android:textAlignment="center"
+                          android:textSize="16sp"
+                          tools:text="120.00"/>
+
+                <at.grabner.circleprogress.CircleProgressView
+                    android:id="@+id/climateCircleView"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="40dp"
+                    CircleProgressView:cpv_autoTextSize="true"
+                    CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_barWidth="35dp"
+                    CircleProgressView:cpv_innerContourSize="0dp"
+                    CircleProgressView:cpv_outerContourSize="0dp"
+                    CircleProgressView:cpv_rimColor="@color/primary_light"
+                    CircleProgressView:cpv_rimWidth="35dp"
+                    CircleProgressView:cpv_seekMode="false"
+                    CircleProgressView:cpv_showUnit="true"
+                    CircleProgressView:cpv_spinColor="@color/primary_light"
+                    CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
+                    CircleProgressView:cpv_textScale="1"
+                    CircleProgressView:cpv_unit="%"
+                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_unitPosition="right_top"
+                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_value="5"/>
+            </TableRow>
+
+        </TableLayout>
 
         <View
-            android:id="@+id/detail_divider1"
+            android:id="@+id/detail_divider_footer"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_margin="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:background="#dadada"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TableRow android:id="@+id/healthcare_index_row" android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_margin="8dp">
-            <TextView android:id="@+id/health_text"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/health_text"
-                      android:textAlignment="viewStart"
-                      android:textSize="16sp"
-                      android:layout_marginStart="8dp"
-            android:layout_marginTop="15dp"/>
-
-            <TextView android:id="@+id/healthcare_value"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAlignment="center"
-                      android:textSize="16sp"
-                      tools:text="120.00"
-                      android:layout_marginStart="12dp"
-                      android:layout_marginEnd="12dp"
-            android:layout_marginTop="15dp"/>
-
-            <at.grabner.circleprogress.CircleProgressView
-                android:id="@+id/healthCircleView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="40dp"
-                CircleProgressView:cpv_autoTextSize="true"
-                CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_barWidth="35dp"
-                CircleProgressView:cpv_innerContourSize="0dp"
-                CircleProgressView:cpv_outerContourSize="0dp"
-                CircleProgressView:cpv_rimColor="@color/primary_light"
-                CircleProgressView:cpv_rimWidth="35dp"
-                CircleProgressView:cpv_seekMode="false"
-                CircleProgressView:cpv_showUnit="true"
-                CircleProgressView:cpv_spinColor="@color/primary_light"
-                CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_textScale="1"
-                CircleProgressView:cpv_unit="%"
-                CircleProgressView:cpv_unitColor="@color/primary_light"
-                CircleProgressView:cpv_unitPosition="right_top"
-                CircleProgressView:cpv_unitScale="1"
-                CircleProgressView:cpv_value="5" />
-
-
-        </TableRow>
-
-        <View
-            android:id="@+id/detail_divider2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tableLayout"/>
+        <LinearLayout
+            android:id="@+id/contrib_min_footer"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="8dp"
-            android:background="#dadada"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.032"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_divider_footer"
+            app:layout_constraintVertical_bias="0.150">
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="21dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/min_contrib_text"
+                android:textSize="14sp"/>
 
-        <TableRow android:id="@+id/climate_index_row" android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_margin="8dp">
-            <TextView android:id="@+id/climate_text"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
+            <TextView android:id="@+id/destination_min_contrib"
+                      style="@style/TextAppearance.AppCompat.Body1"
                       android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/climate_text"
-                      android:textAlignment="viewStart"
-                      android:textSize="16sp"
+                      android:layout_height="21dp"
+                      android:layout_marginEnd="8dp"
                       android:layout_marginStart="8dp"
-                      android:layout_marginTop="15dp"/>
+                      android:layout_marginTop="16dp"
+                      android:textSize="14sp"
+                      tools:text="minValue"/>
 
+        </LinearLayout>
 
-            <TextView android:id="@+id/climate_value"
-                      style="@style/Base.TextAppearance.AppCompat.Headline"
+        <LinearLayout
+            android:id="@+id/contrib_max_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.032"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contrib_min_footer"
+            app:layout_constraintVertical_bias="0.052">
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="21dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:text="@string/max_contrib_text"
+                android:textSize="14sp"/>
+
+            <TextView android:id="@+id/destination_max_contrib"
+                      style="@style/TextAppearance.AppCompat.Body1"
                       android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textAlignment="center"
-                      android:textSize="16sp"
-                      tools:text="120.00"
-                      android:layout_marginStart="12dp"
-                      android:layout_marginTop="15dp"/>
+                      android:layout_height="21dp"
+                      android:layout_marginEnd="8dp"
+                      android:layout_marginStart="8dp"
+                      android:textSize="14sp"
+                      tools:text="maxValue"/>
 
-            <at.grabner.circleprogress.CircleProgressView
-                android:id="@+id/climateCircleView"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="40dp"
-                CircleProgressView:cpv_autoTextSize="true"
-                CircleProgressView:cpv_barColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_barWidth="35dp"
-                CircleProgressView:cpv_innerContourSize="0dp"
-                CircleProgressView:cpv_outerContourSize="0dp"
-                CircleProgressView:cpv_rimColor="@color/primary_light"
-                CircleProgressView:cpv_rimWidth="35dp"
-                CircleProgressView:cpv_seekMode="false"
-                CircleProgressView:cpv_showUnit="true"
-                CircleProgressView:cpv_spinColor="@color/primary_light"
-                CircleProgressView:cpv_textColor="@color/colorPrimaryDark"
-                CircleProgressView:cpv_textScale="1"
-                CircleProgressView:cpv_unit="%"
-                CircleProgressView:cpv_unitColor="@color/primary_light"
-                CircleProgressView:cpv_unitPosition="right_top"
-                CircleProgressView:cpv_unitScale="1"
-                CircleProgressView:cpv_value="5" />
-        </TableRow>
 
-    </TableLayout>
+        </LinearLayout>
 
-    <View
-        android:id="@+id/detail_divider_footer"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:background="#dadada"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tableLayout"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/share_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="24dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/colorAccent"
+            android:contentDescription="@string/action_compare"
+            android:src="@drawable/round_compare_24"
+            android:stateListAnimator="@animator/fab_state_list_anim"
+            app:elevation="6dp"
+            app:fabSize="auto"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contrib_max_footer"
+            app:rippleColor="@color/primary_light"/>
 
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
+
+
 
 
 </ScrollView>

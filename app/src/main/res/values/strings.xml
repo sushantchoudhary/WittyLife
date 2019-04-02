@@ -23,5 +23,11 @@
     <string name="safety_text">Safety Index</string>
     <string name="health_text">Health Care Index</string>
     <string name="climate_text">Climate Index</string>
+    <string name="share_ranking">Share destination ranking</string>
+
+    <string name="action_compare">Compare ranking data</string>
+    <string name="max_contrib_text">Maximum contributors for an underlying section:</string>
+    <string name="min_contrib_text">Minimum contributors for an underlying section:</string>
+    <string name="action_share">Share ranking</string>
 
 </resources>

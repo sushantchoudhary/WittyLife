@@ -7,27 +7,50 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.model.ClimateData;
+import com.appdev.schoudhary.wittylife.model.CrimeData;
+import com.appdev.schoudhary.wittylife.model.HealthCareData;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
+import com.appdev.schoudhary.wittylife.network.ApiService;
+import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import at.grabner.circleprogress.CircleProgressView;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class DetailsActivity extends AppCompatActivity {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
+    private static final String DESTINATION_URL = "https://www.numbeo.com/quality-of-life/in/";
     private TextView mDetailHeader;
     private TextView mPPIValue;
     private TextView mSafetyValue;
     private TextView mHealthValue;
     private TextView mClimateValue;
+    private TextView mMinContribValue;
+    private TextView mMaxContribValue;
+
 
     private static AppDatabase mDB;
 
@@ -37,6 +60,9 @@ public class DetailsActivity extends AppCompatActivity {
     private CircleProgressView mSafetyCircleView;
     private CircleProgressView mHealthCircleView;
     private CircleProgressView mClimateCircleView;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
+    private ShareActionProvider shareActionProvider;
 
 
     @Override
@@ -52,20 +78,13 @@ public class DetailsActivity extends AppCompatActivity {
         mSafetyValue = findViewById(R.id.safety_value);
         mHealthValue = findViewById(R.id.healthcare_value);
         mClimateValue = findViewById(R.id.climate_value);
+        mMinContribValue = findViewById(R.id.destination_min_contrib);
+        mMaxContribValue = findViewById(R.id.destination_max_contrib);
 
         mPPiCircleView = findViewById(R.id.ppiCircleView);
         mSafetyCircleView = findViewById(R.id.safetyCircleView);
         mHealthCircleView = findViewById(R.id.healthCircleView);
         mClimateCircleView = findViewById(R.id.climateCircleView);
-
-
-//        mPPiCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
-//            @Override
-//            public void onProgressChanged(float value) {
-//                Log.d(TAG, "Progress Changed: " + value);
-//            }
-//        });
-
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
@@ -118,6 +137,33 @@ public class DetailsActivity extends AppCompatActivity {
         mHealthCircleView.setValueAnimated(rankingData.getHealthcareIndex().floatValue());
         mClimateCircleView.setValueAnimated(rankingData.getClimateIndex().floatValue());
 
+        setContributorsData(rankingData.getCityName());
+
+        this.setTitle(rankingData.getCityName());
+
+    }
+
+    private void setContributorsData(String cityName) {
+        ApiService apiService = RetroClient.getApiService();
+
+        Single<CrimeData> crimeDataCall = apiService.getDestinationCrimeData(BuildConfig.ApiKey, cityName);
+        Single<HealthCareData> healthDataCall = apiService.getDestinationHealthData(BuildConfig.ApiKey, cityName);
+        Single<ClimateData> climateDataCall = apiService.getDestinationClimateData(BuildConfig.ApiKey, cityName);
+
+        @SuppressLint("SetTextI18n") Disposable disposable = Single.zip(crimeDataCall, healthDataCall, climateDataCall, (crimeData, healthCareData, climateData) -> {
+            List<Integer> data = Arrays.asList(crimeData.getContributors(), healthCareData.getContributors(), climateData.getContributors());
+            Integer maxValue = data.stream().mapToInt(v -> v).max().getAsInt();
+            Integer minValue = data.stream().mapToInt(v -> v).min().getAsInt();
+
+            return new Pair<>(maxValue, minValue);
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(contributors -> {
+                    mMaxContribValue.setText(contributors.first.toString());
+                    mMinContribValue.setText(contributors.second.toString());
+                }, throwable -> showErrorMessage());
+
+        disposables.add(disposable);
 
     }
 
@@ -153,10 +199,55 @@ public class DetailsActivity extends AppCompatActivity {
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.destination_detail, menu);
+        // Fetch and store ShareActionProvider
+//        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+//        setShareIntent(createShareRankingIntent());
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        /* Share menu item clicked */
+        if (itemId == R.id.action_share) {
+            Intent shareIntent = createShareRankingIntent();
+            startActivity(shareIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // Call to update the share intent
+//        private void setShareIntent(Intent shareIntent) {
+//            if (shareActionProvider != null) {
+//                shareActionProvider.setShareIntent(shareIntent);
+//            }
+//        }
+    private Intent createShareRankingIntent() {
+        return Intent.createChooser(ShareCompat.IntentBuilder.from(this)
+                .setChooserTitle("Share ranking data")
+                .setType("text/plain")
+                .setText(DESTINATION_URL + rankingData.getCityName())
+                .getIntent(), getString(R.string.action_share));
+    }
+
     private void showErrorMessage() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.network_error)
                 .setMessage(R.string.network_error_msg)
                 .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
+
+
+    @Override
+    protected void onPause() {
+        disposables.dispose();
+        super.onPause();
+    }
+
 }

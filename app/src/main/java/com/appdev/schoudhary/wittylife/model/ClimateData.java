@@ -1,11 +1,16 @@
 package com.appdev.schoudhary.wittylife.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "climate_data")
 public class ClimateData implements Parcelable
 {
 
@@ -56,6 +61,8 @@ public class ClimateData implements Parcelable
     private Float waterPollution;
     @SerializedName("city_id")
     @Expose
+    @PrimaryKey
+    @ColumnInfo(name = "city_id")
     private Integer cityId;
     public final static Parcelable.Creator<ClimateData> CREATOR = new Creator<ClimateData>() {
 
@@ -74,6 +81,7 @@ public class ClimateData implements Parcelable
     }
             ;
 
+    @Ignore
     protected ClimateData(Parcel in) {
         this.greenAndParksQuality = ((Float) in.readValue((Float.class.getClassLoader())));
         this.pm25 = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -91,13 +99,6 @@ public class ClimateData implements Parcelable
         this.yearLastUpdate = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.waterPollution = ((Float) in.readValue((Float.class.getClassLoader())));
         this.cityId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-    }
-
-    /**
-     * No args constructor for use in serialization
-     *
-     */
-    public ClimateData() {
     }
 
     /**

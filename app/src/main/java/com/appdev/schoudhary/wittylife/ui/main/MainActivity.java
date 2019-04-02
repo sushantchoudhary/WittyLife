@@ -7,7 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -35,15 +34,11 @@ import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.network.UnsplashApiService;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationUrlViewModel;
-import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -70,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private RecyclerView mDestinationLayout;
     private MainActivityAdapter mainActivityAdapter;
     private static AppDatabase mDB;
-
-    private HashMap<QOLRanking, Urls> destinationData;
 
     private List<QOLRanking> rankingList;
 

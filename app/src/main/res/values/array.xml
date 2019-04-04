@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="rankingFilter">
+        <item>Quality of life</item>
+        <item>Healthcare</item>
+        <item>Traffic</item>
+    </string-array>
+</resources>

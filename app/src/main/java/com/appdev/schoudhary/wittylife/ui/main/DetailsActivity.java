@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
@@ -111,6 +113,13 @@ public class DetailsActivity extends AppCompatActivity {
                 }
             }
         }
+
+        findViewById(R.id.compare_fab).setOnClickListener(view -> {
+            Class destinationClass = ComparisonActivity.class;
+            Intent intentToStartComparisonActivity = new Intent(DetailsActivity.this, destinationClass);
+            intentToStartComparisonActivity.putExtra(Intent.EXTRA_TEXT, rankingData.getCityName());
+            startActivity(intentToStartComparisonActivity);
+        });
     }
 
     @SuppressLint("DefaultLocale")
@@ -223,7 +232,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     // Call to update the share intent
-//        private void setShareIntent(Intent shareIntent) {
+//        private void setShareIntent(Intent shareInte          nt) {
 //            if (shareActionProvider != null) {
 //                shareActionProvider.setShareIntent(shareIntent);
 //            }
@@ -243,6 +252,13 @@ public class DetailsActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        setupRankingFromViewModel(rankingData);
+
+    }
 
     @Override
     protected void onPause() {

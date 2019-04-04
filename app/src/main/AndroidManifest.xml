@@ -40,10 +40,21 @@
             android:name=".SuggestionProvider"
             android:authorities="com.appdev.schoudhary.wittylife.SuggestionProvider"/>
 
-        <activity android:name=".ui.main.DetailsActivity" android:parentActivityName=".ui.main.MainActivity">
+        <activity
+            android:name=".ui.main.DetailsActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.MainActivity"/>
+        </activity>
+        <activity android:name=".ui.main.RankingActivity">
+        </activity>
+        <activity android:name=".ui.main.ComparisonActivity"
+                  android:parentActivityName=".ui.main.DetailsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.main.DetailsActivity"/>
         </activity>
     </application>
 

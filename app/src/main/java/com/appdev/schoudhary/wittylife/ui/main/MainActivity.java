@@ -36,6 +36,8 @@ import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationUrlViewModel;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             loadDestinationView();
         }
 
-
     }
 
     private void loadDestinationView() {
@@ -157,6 +158,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                         setupMainViewModel();
                     }
                 });
+        /**
+         * Set intent to launch RankingActivity on selecting ranking image
+         */
+        findViewById(R.id.qolranking).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Class destinationClass = RankingActivity.class;
+                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+                startActivity(intentToStartComparisonActivity);
+            }
+        });
     }
 
 

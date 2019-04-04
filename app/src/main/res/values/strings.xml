@@ -29,5 +29,10 @@
     <string name="max_contrib_text">Maximum contributors for an underlying section:</string>
     <string name="min_contrib_text">Minimum contributors for an underlying section:</string>
     <string name="action_share">Share ranking</string>
+    <string name="filter_ranking">Select ranking..</string>
+    <string name="rank">Rank</string>
+    <string name="ranking_city">City</string>
+    <string name="ranking_qolindex">QOL index</string>
+    <string name="PP_Index">PP Index</string>
 
 </resources>

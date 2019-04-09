@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,9 +37,6 @@ import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationUrlViewModel;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
 
+    private ConstraintLayout parentLayout;
     private RecyclerView mDestinationLayout;
     private MainActivityAdapter mainActivityAdapter;
     private static AppDatabase mDB;
@@ -77,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        parentLayout = findViewById(R.id.mainactivity_layout);
+        // Bring focus back from SearchView to activity layout
+        parentLayout.requestFocus();
+
 
         ActionBar actionBar = getSupportActionBar();
         Objects.requireNonNull(actionBar).setDisplayShowTitleEnabled(false);
@@ -106,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         } else {
             loadDestinationView();
         }
-
     }
 
     private void loadDestinationView() {
@@ -116,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         ApiService apiService = RetroClient.getApiService();
         UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
-
 
         callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
 
@@ -158,18 +160,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                         setupMainViewModel();
                     }
                 });
-        /**
-         * Set intent to launch RankingActivity on selecting ranking image
-         */
-        findViewById(R.id.qolranking).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Class destinationClass = RankingActivity.class;
-                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
-                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
-                startActivity(intentToStartComparisonActivity);
-            }
-        });
+
     }
 
 
@@ -197,6 +188,39 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             mDestinationLayout.setAdapter(mainActivityAdapter);
             //TODO : Fix this call {Skipping layout, no adapter found..}
 //              layout.setQOLData(destinationUrls);
+
+            /**
+             * Set intent to launch RankingActivity on selecting QOL ranking image
+             */
+            findViewById(R.id.qolranking).setOnClickListener(v -> {
+                Class destinationClass = RankingActivity.class;
+                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.QOL);
+                startActivity(intentToStartComparisonActivity);
+            });
+
+            /**
+             * Set intent to launch RankingActivity on selecting Cost of living ranking image
+             */
+            findViewById(R.id.costofliving).setOnClickListener(v -> {
+                Class destinationClass = RankingActivity.class;
+                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.COST);
+                startActivity(intentToStartComparisonActivity);
+            });
+
+            /**
+             * Set intent to launch RankingActivity on selecting Cost of living ranking image
+             */
+            findViewById(R.id.traffic).setOnClickListener(v -> {
+                Class destinationClass = RankingActivity.class;
+                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.TRAFFIC);
+                startActivity(intentToStartComparisonActivity);
+            });
         });
     }
 
@@ -263,6 +287,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     @Override
     protected void onResume() {
+        // To bring focus back from SearchView to activity layout
+        parentLayout.requestFocus();
         super.onResume();
     }
 

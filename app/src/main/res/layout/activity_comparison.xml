@@ -7,4 +7,54 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.ComparisonActivity">
 
+    <!--<include-->
+        <!--android:id="@+id/compare_toolbar"-->
+        <!--layout="@layout/toolbar_spinner" />-->
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        android:animateLayoutChanges="false"
+    >
+        <LinearLayout
+            android:id="@+id/filter_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+        <TextView android:id="@+id/ranking_filter"
+                  style="@style/TextAppearance.AppCompat.Medium"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_margin="10dp"
+                  android:layout_gravity="center_vertical"
+                  android:text="@string/compare_with_city"
+                  tools:text="Compare with city"/>
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_height="42dp"
+        android:layout_width="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+
+    />
+
 </android.support.constraint.ConstraintLayout>

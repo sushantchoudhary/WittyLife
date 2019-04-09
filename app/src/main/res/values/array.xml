@@ -2,7 +2,7 @@
 <resources>
     <string-array name="rankingFilter">
         <item>Quality of life</item>
-        <item>Healthcare</item>
+        <item>Cost of Living</item>
         <item>Traffic</item>
     </string-array>
 </resources>

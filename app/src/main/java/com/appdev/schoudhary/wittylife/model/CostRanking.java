@@ -6,6 +6,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -71,13 +72,6 @@ public class CostRanking implements Parcelable
         this.cityId = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.cpiIndex = ((Double) in.readValue((Double.class.getClassLoader())));
     }
-
-    /**
-     * No args constructor for use in serialization
-     *
-     */
-//    public CostRanking() {
-//    }
 
     /**
      *

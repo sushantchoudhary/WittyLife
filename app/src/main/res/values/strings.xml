@@ -34,5 +34,7 @@
     <string name="ranking_city">City</string>
     <string name="ranking_qolindex">QOL index</string>
     <string name="PP_Index">PP Index</string>
+    <string name="compare_title">Compare ranking</string>
+    <string name="compare_with_city">Compare with city</string>
 
 </resources>

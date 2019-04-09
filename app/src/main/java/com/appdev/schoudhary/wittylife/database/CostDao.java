@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface CostDao {
 
-    @Query("SELECT * FROM costranking ")
+    @Query("SELECT * FROM costranking ORDER BY cpiAndRentIndex  DESC")
     LiveData<List<CostRanking>> loadCostRank();
 
     @Query("DELETE FROM costranking")
@@ -36,5 +36,8 @@ public interface CostDao {
 
     @Query("SELECT * FROM costranking WHERE city_id = :id")
     LiveData<CostRanking> loadCostById(int id);
+
+    @Query("SELECT count(*) FROM costranking")
+    int getRowCount();
 
 }

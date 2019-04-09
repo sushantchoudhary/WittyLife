@@ -7,6 +7,8 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.util.Log;
 
+import com.appdev.schoudhary.wittylife.model.City;
+import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.model.CostRanking;
 import com.appdev.schoudhary.wittylife.model.DestinationIndices;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
@@ -15,7 +17,7 @@ import com.appdev.schoudhary.wittylife.model.TrafficRanking;
 import com.appdev.schoudhary.wittylife.model.Urls;
 
 @Database(entities = {QOLRanking.class, CostRanking.class,
-        TrafficRanking.class, Result.class, Urls.class, DestinationIndices.class}, version = 1, exportSchema = false)
+        TrafficRanking.class, Result.class, Urls.class, DestinationIndices.class, City.class, CityIndices.class}, version = 1, exportSchema = false)
 @TypeConverters({DestinationUrlConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -46,4 +48,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DestinationDao destinationDao();
 
     public  abstract  UrlDao urlDao();
+
+    public abstract CityDao cityDao();
+
+    public abstract CityIndicesDao cityIndicesDao();
 }

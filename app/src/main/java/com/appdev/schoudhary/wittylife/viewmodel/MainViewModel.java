@@ -7,7 +7,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.model.City;
+import com.appdev.schoudhary.wittylife.model.CityIndices;
+import com.appdev.schoudhary.wittylife.model.CostRanking;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
+import com.appdev.schoudhary.wittylife.model.TrafficRanking;
 
 import java.util.List;
 
@@ -17,6 +21,11 @@ public class MainViewModel extends AndroidViewModel {
 
 
     private List<QOLRanking> qolranking;
+    private LiveData<List<CostRanking>> costRanking;
+    private LiveData<List<TrafficRanking>> trafficRanking;
+    private LiveData<List<City>> cityRecords;
+    private CityIndices cityIndices;
+
     private static AppDatabase database;
 
 
@@ -25,7 +34,11 @@ public class MainViewModel extends AndroidViewModel {
         Log.d(TAG, "Retrieving task from database");
         database = AppDatabase.getsInstance(this.getApplication());
         qolranking = database.qolDao().loadQOlRank();
-    }
+        costRanking = database.costDao().loadCostRank();
+        trafficRanking = database.trafficDao().loadTrafficRank();
+
+        cityRecords = database.cityDao().loadCities();
+        }
 
     public List<QOLRanking> getQOLRanking() {
         return qolranking;
@@ -35,4 +48,15 @@ public class MainViewModel extends AndroidViewModel {
         return database.qolDao().loadQOLById(city_id);
     }
 
+    public LiveData<List<CostRanking>> getCostRanking() {
+        return costRanking;
+    }
+
+    public LiveData<List<TrafficRanking>> getTrafficRanking() {
+        return trafficRanking;
+    }
+
+    public LiveData<List<City>> getCityRecords() {
+        return cityRecords;
+    }
 }

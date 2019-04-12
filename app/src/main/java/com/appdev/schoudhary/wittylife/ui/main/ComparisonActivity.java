@@ -222,7 +222,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         piechart.setUsePercentValues(true);
         piechart.getDescription().setEnabled(false);
-        piechart.setExtraOffsets(5, 10, 5, 5);
+        piechart.setExtraOffsets(10, 20, 10, 10);
 
         piechart.setDragDecelerationFrictionCoef(0.95f);
 
@@ -260,13 +260,14 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         // piechart.spin(2000, 0, 360);
 
         Legend l = piechart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         l.setDrawInside(false);
-        l.setXEntrySpace(10f);
-        l.setYEntrySpace(1f);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(5f);
         l.setYOffset(0f);
+        l.setXOffset(5f);
 
         // entry label styling
         piechart.setEntryLabelColor(Color.BLACK);
@@ -586,14 +587,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     private void setData(int count, float range) {
         ArrayList<PieEntry> entries = new ArrayList<>();
-
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the piechart.
-//        for (int i = 0; i < count ; i++) {
-//            entries.add(new PieEntry((float) ((Math.random() * range) + range / 5),
-//                    parties[i % parties.length],
-//                    getResources().getDrawable(R.drawable.star)));
-//        }
 
         entries.add(new PieEntry(18.5f, "Green"));
         entries.add(new PieEntry(26.7f, "Yellow"));

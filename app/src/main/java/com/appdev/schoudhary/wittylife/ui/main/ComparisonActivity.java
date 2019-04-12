@@ -38,14 +38,21 @@ import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModel;
 import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModelFactory;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
@@ -74,7 +81,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     private static AppDatabase mDB;
     private List<String> cityRecords;
 
-    private PieChart chart;
+    private PieChart piechart;
+    private BarChart barChart;
+
     private SeekBar seekBarX, seekBarY;
     private TextView tvX, tvY;
 
@@ -100,6 +109,20 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         tfLight = Typeface.createFromAsset(getApplicationContext().getAssets(), "OpenSans-Light.ttf");
         tfRegular = Typeface.createFromAsset(getApplicationContext().getAssets(), "Roboto-Regular.ttf");
 
+
+        piechart = findViewById(R.id.piechart);
+
+        barChart = findViewById(R.id.stackbar);
+        barChart.setOnChartValueSelectedListener(this);
+
+        tvX = findViewById(R.id.tvXMax);
+        tvY = findViewById(R.id.tvYMax);
+
+        seekBarX = findViewById(R.id.seekBar1);
+        seekBarY = findViewById(R.id.seekBar2);
+
+        seekBarX.setOnSeekBarChangeListener(this);
+        seekBarY.setOnSeekBarChangeListener(this);
 
 
 
@@ -137,69 +160,118 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 }
             }
         }
-
-        tvX = findViewById(R.id.tvXMax);
-        tvY = findViewById(R.id.tvYMax);
-
-        seekBarX = findViewById(R.id.seekBar1);
-        seekBarY = findViewById(R.id.seekBar2);
-
-        seekBarX.setOnSeekBarChangeListener(this);
-        seekBarY.setOnSeekBarChangeListener(this);
-
-        chart = findViewById(R.id.chart1);
-        chart.setUsePercentValues(true);
-        chart.getDescription().setEnabled(false);
-        chart.setExtraOffsets(5, 10, 5, 5);
-
-        chart.setDragDecelerationFrictionCoef(0.95f);
+        /**
+         * Setup pie piechart comparison
+         */
+        bindViewPieChart();
 
 
-        chart.setCenterTextTypeface(tfLight);
-//        chart.setCenterText(generateCenterSpannableText());
+        /**
+         *  Setup stack bar piechart
+         */
+        bindViewStackBarChart();
 
-        chart.setDrawHoleEnabled(false);
-        chart.setHoleColor(Color.GRAY);
+    }
 
-        chart.setTransparentCircleColor(Color.WHITE);
-        chart.setTransparentCircleAlpha(110);
+    private void bindViewStackBarChart() {
 
-        chart.setHoleRadius(48f);
-        chart.setTransparentCircleRadius(51f);
+        barChart.getDescription().setEnabled(false);
 
-        chart.setDrawCenterText(false);
+        // if more than 60 entries are displayed in the piechart, no values will be
+        // drawn
+        barChart.setMaxVisibleValueCount(40);
 
-        chart.setRotationAngle(0);
-        // enable rotation of the chart by touch
-        chart.setRotationEnabled(true);
-        chart.setHighlightPerTapEnabled(true);
+        // scaling can now only be done on x- and y-axis separately
+        barChart.setPinchZoom(false);
 
-        // chart.setUnit(" €");
-        // chart.setDrawUnitsInChart(true);
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+
+        barChart.setDrawValueAboveBar(false);
+        barChart.setHighlightFullBarEnabled(false);
+
+        // change the position of the y-labels
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setEnabled(false);
+//        leftAxis.setValueFormatter(new MyValueFormatter("K"));
+        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        barChart.getAxisRight().setEnabled(false);
+
+        XAxis xLabels = barChart.getXAxis();
+        xLabels.setEnabled(false);
+//        xLabels.setPosition(XAxis.XAxisPosition.TOP);
+
+        // barChart.setDrawXLabels(false);
+        // barChart.setDrawYLabels(false);
+
+        // setting data
+        seekBarX.setProgress(12);
+        seekBarY.setProgress(100);
+
+        Legend l = barChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setFormSize(8f);
+        l.setFormToTextSpace(4f);
+        l.setXEntrySpace(6f);
+    }
+
+    private void bindViewPieChart() {
+
+        piechart.setUsePercentValues(true);
+        piechart.getDescription().setEnabled(false);
+        piechart.setExtraOffsets(5, 10, 5, 5);
+
+        piechart.setDragDecelerationFrictionCoef(0.95f);
+
+
+        piechart.setCenterTextTypeface(tfLight);
+//        piechart.setCenterText(generateCenterSpannableText());
+
+        piechart.setDrawHoleEnabled(false);
+        piechart.setHoleColor(Color.GRAY);
+
+        piechart.setTransparentCircleColor(Color.WHITE);
+        piechart.setTransparentCircleAlpha(110);
+
+        piechart.setHoleRadius(0f);
+        piechart.setTransparentCircleRadius(0f);
+
+        piechart.setDrawCenterText(false);
+
+        piechart.setRotationAngle(0);
+        // enable rotation of the piechart by touch
+        piechart.setRotationEnabled(true);
+        piechart.setHighlightPerTapEnabled(true);
+
+        // piechart.setUnit(" €");
+        // piechart.setDrawUnitsInChart(true);
 
         // add a selection listener
-        chart.setOnChartValueSelectedListener(this);
+        piechart.setOnChartValueSelectedListener(this);
+
 
         seekBarX.setProgress(4);
         seekBarY.setProgress(10);
 
-//        chart.animateY(1400, Easing.EaseInOutQuad);
-        // chart.spin(2000, 0, 360);
+        piechart.animateXY(1400, 1400);
+        // piechart.spin(2000, 0, 360);
 
-        Legend l = chart.getLegend();
+        Legend l = piechart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
         l.setDrawInside(false);
-        l.setXEntrySpace(7f);
-        l.setYEntrySpace(0f);
+        l.setXEntrySpace(10f);
+        l.setYEntrySpace(1f);
         l.setYOffset(0f);
 
         // entry label styling
-        chart.setEntryLabelColor(Color.BLACK);
-        chart.setEntryLabelTypeface(tfRegular);
-        chart.setEntryLabelTextSize(12f);
-
+        piechart.setEntryLabelColor(Color.BLACK);
+        piechart.setEntryLabelTypeface(tfRegular);
+        piechart.setEntryLabelTextSize(12f);
     }
 
     @Override
@@ -427,10 +499,54 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//        tvX.setText(String.valueOf(seekBarX.getProgress()));
+//        tvY.setText(String.valueOf(seekBarY.getProgress()));
         tvX.setText(String.valueOf(seekBarX.getProgress()));
         tvY.setText(String.valueOf(seekBarY.getProgress()));
 
+        // Setup piechart data
         setData(seekBarX.getProgress(), seekBarY.getProgress());
+
+        // Setup stackbarchart data
+        ArrayList<BarEntry> values = new ArrayList<>();
+
+        for (int i = 0; i < seekBarX.getProgress(); i++) {
+            float mul = (seekBarY.getProgress() + 1);
+            float val1 = (float) (Math.random() * mul) + mul / 3;
+            float val2 = (float) (Math.random() * mul) + mul / 3;
+            float val3 = (float) (Math.random() * mul) + mul / 3;
+
+            values.add(new BarEntry(
+                    i,
+                    new float[]{val1, val2, val3}));
+        }
+
+        BarDataSet set1;
+
+        if (barChart.getData() != null &&
+                barChart.getData().getDataSetCount() > 0) {
+            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
+            set1.setValues(values);
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
+        } else {
+            set1 = new BarDataSet(values, "Statistics Vienna 2014");
+            set1.setDrawIcons(false);
+            set1.setColors(getColors());
+            set1.setStackLabels(new String[]{"Births", "Divorces", "Marriages"});
+
+            ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1);
+
+            BarData data = new BarData(dataSets);
+            data.setValueFormatter(new StackedValueFormatter(true, "", 1));
+            data.setValueTextColor(Color.WHITE);
+
+            barChart.setData(data);
+        }
+
+        barChart.setFitBars(true);
+        barChart.invalidate();
     }
 
     @Override
@@ -472,7 +588,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
+        // the piechart.
 //        for (int i = 0; i < count ; i++) {
 //            entries.add(new PieEntry((float) ((Math.random() * range) + range / 5),
 //                    parties[i % parties.length],
@@ -517,16 +633,27 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         //dataSet.setSelectionShift(0f);
 
         PieData data = new PieData(dataSet);
-//        data.setValueFormatter(new PercentFormatter(chart));
+//        data.setValueFormatter(new PercentFormatter(piechart));
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.WHITE);
         data.setValueTypeface(tfLight);
-        chart.setData(data);
+        piechart.setData(data);
 
         // undo all highlights
-        chart.highlightValues(null);
+        piechart.highlightValues(null);
 
-        chart.invalidate();
+        piechart.invalidate();
+    }
+
+
+    private int[] getColors() {
+
+        // have as many colors as stack-values per entry
+        int[] colors = new int[3];
+
+        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+
+        return colors;
     }
 
 }

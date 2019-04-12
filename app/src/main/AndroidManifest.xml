@@ -48,19 +48,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.MainActivity"/>
         </activity>
-        <activity android:name=".ui.main.RankingActivity"
-                  android:parentActivityName=".ui.main.MainActivity">
+        <activity
+            android:name=".ui.main.RankingActivity"
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.MainActivity"/>
-
         </activity>
-        <activity android:name=".ui.main.ComparisonActivity"
-                  android:parentActivityName=".ui.main.DetailsActivity"
-                  android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity
+            android:name=".ui.main.ComparisonActivity"
+            android:parentActivityName=".ui.main.DetailsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.DetailsActivity"/>
+        </activity>
+        <activity android:name=".ui.main.MPActivity">
         </activity>
     </application>
 

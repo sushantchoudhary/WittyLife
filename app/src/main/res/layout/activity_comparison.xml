@@ -42,6 +42,65 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/seekBar1" />
+
+        <SeekBar
+            android:id="@+id/seekBar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="8dp"
+            android:layout_toStartOf="@+id/tvYMax"
+            android:layout_marginEnd="5dp"
+            android:max="200"
+            android:paddingBottom="12dp" />
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/seekBar2"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="35dp"
+            android:layout_toStartOf="@+id/tvXMax"
+            android:layout_marginEnd="5dp"
+            android:max="25"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvXMax"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/seekBar1"
+            android:layout_alignParentEnd="true"
+            android:text="dash"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="end"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/tvYMax"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/seekBar2"
+            android:layout_alignParentEnd="true"
+            android:text="dash"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="end"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </RelativeLayout>
 
     <ProgressBar
         android:id="@+id/pb_loading_indicator"

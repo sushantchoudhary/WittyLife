@@ -35,7 +35,10 @@ public interface CityIndicesDao {
     void deleteCost(CityIndices cityIndices);
 
     @Query("SELECT * FROM city_indices WHERE city_name = :name")
-    LiveData<CityIndices> loadCostByName(String name);
+    LiveData<CityIndices> loadCityByName(String name);
+
+    @Query("SELECT * FROM city_indices WHERE city_name = :name")
+    CityIndices loadCityByNameRaw(String name);
 
     @Query("SELECT count(*) FROM city_indices")
     int getRowCount();

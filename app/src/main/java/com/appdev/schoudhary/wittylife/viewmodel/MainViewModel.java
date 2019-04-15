@@ -20,7 +20,7 @@ public class MainViewModel extends AndroidViewModel {
     private static final String TAG = MainViewModel.class.getSimpleName();
 
 
-    private List<QOLRanking> qolranking;
+    private LiveData<List<QOLRanking>> qolranking;
     private LiveData<List<CostRanking>> costRanking;
     private LiveData<List<TrafficRanking>> trafficRanking;
     private LiveData<List<City>> cityRecords;
@@ -40,7 +40,7 @@ public class MainViewModel extends AndroidViewModel {
         cityRecords = database.cityDao().loadCities();
         }
 
-    public List<QOLRanking> getQOLRanking() {
+    public LiveData<List<QOLRanking>> getQOLRanking() {
         return qolranking;
     }
 

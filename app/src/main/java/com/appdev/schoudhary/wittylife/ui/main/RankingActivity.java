@@ -22,6 +22,7 @@ import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.TrafficRanking;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
+import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 
 import java.util.Arrays;
@@ -142,6 +143,7 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
     /**
      * Responsible for selecting correct spinner option based on ranking type from main activity
+     *
      * @param rankingOption
      */
     private void resolveRankingView(RankingOptions rankingOption) {
@@ -227,17 +229,13 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
     }
 
-    private void showErrorMessage() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.network_error)
-                .setMessage(R.string.network_error_msg)
-                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
-    }
 
     private void setupRankingFromViewModel() {
         final MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        qolRankingData = viewModel.getQOLRanking();
-        populateQOLUI(qolRankingData);
+        viewModel.getQOLRanking().observe(this, qolRankings -> {
+            qolRankingData = qolRankings;
+            populateQOLUI(qolRankingData);
+        });
     }
 
     private void setupCostRankingFromViewModel() {
@@ -283,19 +281,35 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
         } else if (selectedItem.equals(RankingOptions.COST.getRankingOption())) {
             rankingOption = RankingOptions.COST;
 
-            //FIXME Check DB first then network
-            if(mDB.costDao().getRowCount() > 0) {
-                setupCostRankingFromViewModel();
-            } else {
-                fetchAndUpdateCostUI();
-            }
+            AppExecutors.getInstance().diskIO().execute(() -> {
+                //FIXME Check DB first then network
+                int count = mDB.costDao().getRowCount();
+
+                runOnUiThread(() -> {
+                    if (count > 0) {
+                        setupCostRankingFromViewModel();
+                    } else {
+                        fetchAndUpdateCostUI();
+                    }
+                });
+            });
         } else {
             rankingOption = RankingOptions.TRAFFIC;
-            if(mDB.trafficDao().getRowCount() > 0) {
-                setupTrafficRankingFromViewModel();
-            } else {
-                fetchAndUpdateTrafficUI();
-            }
+
+            AppExecutors.getInstance().diskIO().execute(() -> {
+                int trafficCount = mDB.trafficDao().getRowCount();
+
+                runOnUiThread(() -> {
+                    if (trafficCount > 0) {
+                        setupTrafficRankingFromViewModel();
+                    } else {
+                        fetchAndUpdateTrafficUI();
+                    }
+                });
+
+            });
+
+
         }
     }
 
@@ -319,7 +333,9 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
                     @Override
                     public void onNext(List<TrafficRanking> trafficRankings) {
-                        mDB.trafficDao().insertTrafficList(trafficRankings);
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.trafficDao().insertTrafficList(trafficRankings);
+                        });
                     }
 
                     @Override
@@ -357,7 +373,9 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
                     @Override
                     public void onNext(List<CostRanking> costRankings) {
-                        mDB.costDao().insertCostList(costRankings);
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.costDao().insertCostList(costRankings);
+                        });
                     }
 
                     @Override
@@ -377,6 +395,14 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         parent.setSelection(0);
+    }
+
+
+    private void showErrorMessage() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.network_error)
+                .setMessage(R.string.network_error_msg)
+                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
 
 

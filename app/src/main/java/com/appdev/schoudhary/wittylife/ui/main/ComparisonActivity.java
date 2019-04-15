@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,13 +21,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
@@ -35,10 +36,11 @@ import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
+import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModel;
-import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModelFactory;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -57,8 +59,11 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -68,7 +73,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, SeekBar.OnSeekBarChangeListener, OnChartValueSelectedListener {
+public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, OnChartValueSelectedListener {
     private static final String TAG = ComparisonActivity.class.getSimpleName();
     private ActionBar actionBar;
     private ProgressBar mLoadingIndicator;
@@ -77,6 +82,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     private MenuItem spinnerItem;
 
     private String sourceCity;
+    private String selectedCity;
 
     private static AppDatabase mDB;
     private List<String> cityRecords;
@@ -84,14 +90,12 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     private PieChart piechart;
     private BarChart barChart;
 
-    private SeekBar seekBarX, seekBarY;
-    private TextView tvX, tvY;
-
     private CompositeDisposable disposables = new CompositeDisposable();
 
     private Typeface tfLight;
     private Typeface tfRegular;
 
+    private Boolean spinnerTouched = false;
 
 
     @Override
@@ -115,16 +119,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         barChart = findViewById(R.id.stackbar);
         barChart.setOnChartValueSelectedListener(this);
 
-        tvX = findViewById(R.id.tvXMax);
-        tvY = findViewById(R.id.tvYMax);
-
-        seekBarX = findViewById(R.id.seekBar1);
-        seekBarY = findViewById(R.id.seekBar2);
-
-        seekBarX.setOnSeekBarChangeListener(this);
-        seekBarY.setOnSeekBarChangeListener(this);
-
-
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
@@ -140,22 +134,25 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         if (savedInstanceState != null) {
             // Restore value of members from saved state
             cityRecords = savedInstanceState.getStringArrayList("cityRecords");
-
+//            savedInstanceState.getInt("spinnerPosition");
+            selectedCity = savedInstanceState.getString("selectedCity");
+            sourceCity = savedInstanceState.getString("sourceCity");
             /**
              * Updating spinner UI from database
              */
 //            populateSpinnerFromDB(savedInstanceState);
+            setupSelectedCityFromViewModel(selectedCity);
         } else {
             Intent intentFromHome = getIntent();
             if (intentFromHome != null) {
                 if (intentFromHome.hasExtra(Intent.EXTRA_TEXT)) {
                     sourceCity = intentFromHome.getStringExtra(Intent.EXTRA_TEXT);
-//                    setupMovieDetailFromViewModel(movieRecord);
+//                    setupMovieDetailFromViewModel();
                     /**
                      * Fetching destination ranking from API on destination details loading
                      */
 //                    loadMovieReviewsInDB();
-                    fetchAndUpdateIndicesFromAPI(sourceCity);
+                    fetchAndUpdateIndicesFromAPI(intentFromHome.getStringExtra(Intent.EXTRA_TEXT));
                     fetchAndUpdateSpinner();
                 }
             }
@@ -173,112 +170,16 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     }
 
-    private void bindViewStackBarChart() {
-
-        barChart.getDescription().setEnabled(false);
-
-        // if more than 60 entries are displayed in the piechart, no values will be
-        // drawn
-        barChart.setMaxVisibleValueCount(40);
-
-        // scaling can now only be done on x- and y-axis separately
-        barChart.setPinchZoom(false);
-
-        barChart.setDrawGridBackground(false);
-        barChart.setDrawBarShadow(false);
-
-        barChart.setDrawValueAboveBar(false);
-        barChart.setHighlightFullBarEnabled(false);
-
-        // change the position of the y-labels
-        YAxis leftAxis = barChart.getAxisLeft();
-        leftAxis.setEnabled(false);
-//        leftAxis.setValueFormatter(new MyValueFormatter("K"));
-        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-        barChart.getAxisRight().setEnabled(false);
-
-        XAxis xLabels = barChart.getXAxis();
-        xLabels.setEnabled(false);
-//        xLabels.setPosition(XAxis.XAxisPosition.TOP);
-
-        // barChart.setDrawXLabels(false);
-        // barChart.setDrawYLabels(false);
-
-        // setting data
-        seekBarX.setProgress(12);
-        seekBarY.setProgress(100);
-
-        Legend l = barChart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        l.setDrawInside(false);
-        l.setFormSize(8f);
-        l.setFormToTextSpace(4f);
-        l.setXEntrySpace(6f);
-    }
-
-    private void bindViewPieChart() {
-
-        piechart.setUsePercentValues(true);
-        piechart.getDescription().setEnabled(false);
-        piechart.setExtraOffsets(10, 20, 10, 10);
-
-        piechart.setDragDecelerationFrictionCoef(0.95f);
-
-
-        piechart.setCenterTextTypeface(tfLight);
-//        piechart.setCenterText(generateCenterSpannableText());
-
-        piechart.setDrawHoleEnabled(false);
-        piechart.setHoleColor(Color.GRAY);
-
-        piechart.setTransparentCircleColor(Color.WHITE);
-        piechart.setTransparentCircleAlpha(110);
-
-        piechart.setHoleRadius(0f);
-        piechart.setTransparentCircleRadius(0f);
-
-        piechart.setDrawCenterText(false);
-
-        piechart.setRotationAngle(0);
-        // enable rotation of the piechart by touch
-        piechart.setRotationEnabled(true);
-        piechart.setHighlightPerTapEnabled(true);
-
-        // piechart.setUnit(" €");
-        // piechart.setDrawUnitsInChart(true);
-
-        // add a selection listener
-        piechart.setOnChartValueSelectedListener(this);
-
-
-        seekBarX.setProgress(4);
-        seekBarY.setProgress(10);
-
-        piechart.animateXY(1400, 1400);
-        // piechart.spin(2000, 0, 360);
-
-        Legend l = piechart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        l.setDrawInside(false);
-        l.setXEntrySpace(7f);
-        l.setYEntrySpace(5f);
-        l.setYOffset(0f);
-        l.setXOffset(5f);
-
-        // entry label styling
-        piechart.setEntryLabelColor(Color.BLACK);
-        piechart.setEntryLabelTypeface(tfRegular);
-        piechart.setEntryLabelTextSize(12f);
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putStringArrayList("cityRecords", (ArrayList<String>) cityRecords);
         super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList("cityRecords", (ArrayList<String>) cityRecords);
+
+        outState.putString("sourceCity", sourceCity);
+        outState.putString("selectedCity", selectedCity);
+
         Log.d(TAG, "Saving cityRecords in bundle during orientation change");
 
     }
@@ -287,6 +188,12 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         cityRecords = savedInstanceState.getStringArrayList("cityRecords");
+
+        //FIXME Use viewmodel to save UI state
+        sourceCity = savedInstanceState.getString("sourceCity");
+        selectedCity = savedInstanceState.getString("selectedCity");
+
+
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
 
@@ -309,6 +216,16 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        spinner.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                System.out.println("Real value selected in spinner.");
+                spinnerTouched = true;
+                return false;
+            }
+        });
+
         spinner.setOnItemSelectedListener(ComparisonActivity.this);
     }
 
@@ -319,7 +236,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
+        //FIXME Update menu icon color to white
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.comparison_spinner, menu);
 
@@ -327,6 +244,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         spinner = (Spinner) spinnerItem.getActionView();
 
         spinner.setFitsSystemWindows(true);
+
 
 //        spinnerItem.expandActionView();
         spinnerItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
@@ -362,27 +280,13 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String selectedCity = (String) parent.getSelectedItem();
+        String selectedItem = (String) parent.getSelectedItem();
 
         //FIXME Should live in ViewModel
-        fetchAndUpdateIndicesFromAPI(selectedCity);
-
-        CityIndicesViewModelFactory selectedFactory = new CityIndicesViewModelFactory(mDB, selectedCity);
-        final CityIndicesViewModel viewModel = ViewModelProviders.of(this, selectedFactory).get(CityIndicesViewModel.class);
-
-        viewModel.getCityIndices().observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
-            @SuppressLint("DefaultLocale")
-            @Override
-            public void onChanged(@Nullable CityIndices selectedCityIndices) {
-                if (sourceCity != null && selectedCityIndices != null) {
-
-                    CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
-                    bindChartingView(String.format("%.2f", sourceCityIndices.getQualityOfLifeIndex()),
-                            String.format("%.2f", selectedCityIndices.getQualityOfLifeIndex()));
-
-                }
-            }
-        });
+        if (spinnerTouched) {
+            fetchAndUpdateIndicesFromAPI(selectedItem);
+        }
+        spinnerTouched = false;
 
 
 //        CustomLiveData liveData = new CustomLiveData(mDB.cityIndicesDao().loadCityByName(sourceCity),
@@ -390,13 +294,304 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //
 //        LiveData<CityIndices> indices =  Transformations.switchMap(liveData ,
 //                cityRecords -> bindChartingView(cityRecords.first, cityRecords.second));
+    }
+
+    private void setupSelectedCityFromViewModel(String selectedCity) {
+        final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
+
+        viewModel.loadCity(selectedCity);
+
+        viewModel.getCityIndices().observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onChanged(@Nullable CityIndices selectedCityIndices) {
+
+                if (selectedCityIndices.getSafetyIndex() != null
+                        && sourceCity != null
+                        && selectedCityIndices.getClimateIndex() != null
+                        && !selectedCity.equals(sourceCity)) {
+
+                    AppExecutors.getInstance().diskIO().execute(() -> {
+                        CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                bindChartingView(sourceCityIndices, selectedCityIndices);
+                            }
+                        });
+                    });
+                } else {
+                    //Clear chart when comparison data not found
+                    piechart.clear();
+                    barChart.clear();
+                    piechart.invalidate();
+                    barChart.invalidate();
+                }
+            }
+
+        });
 
 
     }
 
-    private void bindChartingView(String sourceCity, String selectedCity) {
-        System.out.printf("*************" + sourceCity + "**********" + selectedCity);
+    private void bindChartingView(@NonNull CityIndices sourceCityQOLIndex, @NonNull CityIndices selectedCityQOLIndex) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+
+        Float sourceCity = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getSafetyIndex()));
+        Float selectedCity = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getSafetyIndex()));
+        Map<String, Float> qolData = new HashMap<>();
+        qolData.put(sourceCityQOLIndex.getName(), sourceCity);
+        qolData.put(selectedCityQOLIndex.getName(), selectedCity);
+
+        setPieData(qolData);
+
+        //FIXME Handle null data from API
+        Float sourceCityClimate = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getClimateIndex()));
+        Float selectedCityClimate = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getClimateIndex()));
+        Map<String, Float> climateData = new HashMap<>();
+        climateData.put(sourceCityQOLIndex.getName(), sourceCityClimate);
+        climateData.put(selectedCityQOLIndex.getName(), selectedCityClimate);
+
+        setStackData(climateData);
     }
+
+
+    private void bindViewStackBarChart() {
+
+        barChart.getDescription().setEnabled(false);
+        barChart.getDescription().setText("Climate Index");
+        barChart.getDescription().setTextSize(12f);
+
+        // if more than 60 entries are displayed in the piechart, no values will be
+        // drawn
+        barChart.setMaxVisibleValueCount(40);
+
+        // scaling can now only be done on x- and y-axis separately
+        barChart.setPinchZoom(false);
+
+        barChart.setDrawGridBackground(false);
+        barChart.setDrawBarShadow(false);
+
+        barChart.setDrawValueAboveBar(false);
+        barChart.setHighlightFullBarEnabled(false);
+
+        // change the position of the y-labels
+        YAxis leftAxis = barChart.getAxisLeft();
+        leftAxis.setEnabled(false);
+//        leftAxis.setValueFormatter(new MyValueFormatter("K"));
+        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+        barChart.getAxisRight().setEnabled(false);
+
+        XAxis xLabels = barChart.getXAxis();
+        xLabels.setEnabled(false);
+//        xLabels.setPosition(XAxis.XAxisPosition.TOP);
+
+        // barChart.setDrawXLabels(false);
+        // barChart.setDrawYLabels(false);
+
+        // setting data
+//        seekBarX.setProgress(12);
+//        seekBarY.setProgress(100);
+
+        barChart.setNoDataText("No climate data available for comparison");
+        barChart.setNoDataTextColor(R.color.colorAccent);
+        Paint paint = barChart.getPaint(Chart.PAINT_INFO);
+        paint.setTextSize(32f);
+
+        Legend l = barChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setFormSize(8f);
+        l.setFormToTextSpace(4f);
+        l.setXEntrySpace(6f);
+        l.setEnabled(true);
+        l.setTextSize(12f);
+        l.setWordWrapEnabled(true);
+        l.setForm(Legend.LegendForm.CIRCLE);
+
+
+    }
+
+    private void bindViewPieChart() {
+
+        piechart.setUsePercentValues(true);
+        piechart.getDescription().setEnabled(true);
+        piechart.getDescription().setTextSize(12f);
+        piechart.getDescription().setText("Safety Rating");
+        piechart.setExtraOffsets(10, 20, 10, 10);
+
+        piechart.setDragDecelerationFrictionCoef(0.95f);
+
+
+        piechart.setCenterTextTypeface(tfLight);
+//        piechart.setCenterText(generateCenterSpannableText());
+
+        piechart.setDrawHoleEnabled(false);
+        piechart.setHoleColor(Color.GRAY);
+
+        piechart.setTransparentCircleColor(Color.BLACK);
+        piechart.setTransparentCircleAlpha(110);
+
+        piechart.setHoleRadius(0f);
+        piechart.setTransparentCircleRadius(0f);
+
+        piechart.setDrawCenterText(false);
+
+        piechart.setRotationAngle(0);
+        // enable rotation of the piechart by touch
+        piechart.setRotationEnabled(true);
+        piechart.setHighlightPerTapEnabled(true);
+
+        // piechart.setUnit(" €");
+        // piechart.setDrawUnitsInChart(true);
+
+        // add a selection listener
+        piechart.setOnChartValueSelectedListener(this);
+
+
+//        seekBarX.setProgress(4);
+//        seekBarY.setProgress(10);
+
+        piechart.animateXY(1400, 1400);
+        // piechart.spin(2000, 0, 360);
+
+        Legend l = piechart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+
+        l.setFormSize(8f);
+        l.setFormToTextSpace(4f);
+
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(5f);
+        l.setYOffset(0f);
+        l.setXOffset(0f);
+        l.setWordWrapEnabled(true);
+        l.setEnabled(false);
+
+        // entry label styling
+        piechart.setEntryLabelColor(Color.BLACK);
+        piechart.setEntryLabelTypeface(tfRegular);
+        piechart.setEntryLabelTextSize(10f);
+
+        piechart.setNoDataText("No safety data available for comparison");
+        piechart.setNoDataTextColor(R.color.colorAccent);
+        Paint paint = piechart.getPaint(Chart.PAINT_INFO);
+        paint.setTextSize(32f);
+
+    }
+
+    private void setStackData(@NonNull Map<String, Float> pppData) {
+        ArrayList<BarEntry> values = new ArrayList<>();
+
+        List<Float> stackData = new ArrayList<>();
+        List<String> stackCity = new ArrayList<>();
+
+        for (Map.Entry<String, Float> stringFloatEntry : pppData.entrySet()) {
+            stackData.add(stringFloatEntry.getValue());
+            stackCity.add(stringFloatEntry.getKey());
+        }
+
+        values.add(new BarEntry(1f, new float[]{stackData.get(0), stackData.get(1)}));
+
+        BarDataSet set1;
+
+        if (barChart.getData() != null &&
+                barChart.getData().getDataSetCount() > 0) {
+            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
+            set1.setColors(getColors());
+            set1.setStackLabels(new String[]{stackCity.get(0), stackCity.get(1)});
+            set1.setValues(values);
+            barChart.getData().notifyDataChanged();
+            barChart.notifyDataSetChanged();
+        } else {
+            set1 = new BarDataSet(values, "Climate Index");
+            set1.setDrawIcons(false);
+            set1.setColors(getColors());
+            set1.setStackLabels(new String[]{stackCity.get(0), stackCity.get(1)});
+
+            ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+            dataSets.add(set1);
+
+            BarData data = new BarData(dataSets);
+            data.setValueFormatter(new StackedValueFormatter(true, "", 1));
+            data.setValueTextColor(Color.BLACK);
+            data.setValueTextSize(12f);
+
+            barChart.setData(data);
+        }
+
+
+        barChart.setFitBars(true);
+        barChart.invalidate();
+    }
+
+    private void setPieData(Map<String, Float> qolIndex) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+//        entries.add(new PieEntry(18.5f, "Green"));
+//        entries.add(new PieEntry(26.7f, "Yellow"));
+//        entries.add(new PieEntry(24.0f, "Red"));
+//        entries.add(new PieEntry(30.8f, "Blue"));
+        qolIndex.forEach((k, v) -> entries.add(new PieEntry(v, k)));
+
+
+        PieDataSet dataSet = new PieDataSet(entries, "Safety Rating");
+
+        dataSet.setDrawIcons(false);
+
+        dataSet.setSliceSpace(3f);
+        dataSet.setIconsOffset(new MPPointF(0, 40));
+        dataSet.setSelectionShift(5f);
+
+        // add a lot of colors
+
+        ArrayList<Integer> colors = new ArrayList<>();
+
+//        for (int c : ColorTemplate.VORDIPLOM_COLORS)
+//            colors.add(c);
+
+//        for (int c : ColorTemplate.JOYFUL_COLORS)
+//            colors.add(c);
+
+//        for (int c : ColorTemplate.COLORFUL_COLORS)
+//            colors.add(c);
+
+        for (int c : ColorTemplate.LIBERTY_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.PASTEL_COLORS)
+            colors.add(c);
+
+        for (int c : ColorTemplate.MATERIAL_COLORS)
+            colors.add(c);
+
+        colors.add(ColorTemplate.getHoloBlue());
+
+        dataSet.setColors(colors);
+        //dataSet.setSelectionShift(0f);
+
+        PieData data = new PieData(dataSet);
+//        data.setValueFormatter(new PercentFormatter(piechart));
+        data.setValueTextSize(12f);
+        data.setValueTextColor(Color.BLACK);
+        data.setValueTypeface(tfRegular);
+
+        piechart.setData(data);
+        piechart.getData().notifyDataChanged();
+        piechart.notifyDataSetChanged();
+
+        // undo all highlights
+        piechart.highlightValues(null);
+
+        piechart.invalidate();
+    }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
@@ -406,11 +601,15 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     //FIXME Implement Repository and network bound resource
     private void fetchAndUpdateSpinner() {
-        if (mDB.cityDao().getRowCount() > 0) {
-            populateSpinnerFromDB(null);
-        } else {
-            fetchAndUpdateSpinnerFromAPI();
-        }
+
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            int count = mDB.cityDao().getRowCount();
+            if (count > 0) {
+                populateSpinnerFromDB(null);
+            } else {
+                fetchAndUpdateSpinnerFromAPI();
+            }
+        });
     }
 
     private void fetchAndUpdateSpinnerFromAPI() {
@@ -433,7 +632,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                     @Override
                     public void onNext(CityRecords cityRecords) {
                         List<City> cities = cityRecords.getCities();
-                        mDB.cityDao().insertCityList(cities);
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.cityDao().insertCityList(cities);
+                        });
                     }
 
                     @Override
@@ -460,13 +661,32 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         Single<CityIndices> callCityIndices;
         ApiService apiService = RetroClient.getApiService();
         callCityIndices = apiService.getCityIndices(BuildConfig.ApiKey, cityName);
+        //FIXME progress bar color is not consistent across app
         mLoadingIndicator.setVisibility(View.VISIBLE);
 
         Disposable disposable = callCityIndices.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(cityIndices -> {
                             mLoadingIndicator.setVisibility(View.INVISIBLE);
-                            mDB.cityIndicesDao().insertIndices(cityIndices);
+
+                            AppExecutors.getInstance().diskIO().execute(() -> {
+                                //FiXME Primary key could be null, filter before insert
+                                mDB.cityIndicesDao().insertIndices(cityIndices);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Skipping any comparison  on activity start
+                                        if (cityIndices.getName().contains(sourceCity)) {
+                                            sourceCity = cityIndices.getName();
+                                        } else {
+                                            selectedCity = cityIndices.getName();
+                                            setupSelectedCityFromViewModel(cityIndices.getName());
+                                        }
+                                    }
+                                });
+                            });
+
+
                         }, throwable -> {
                             mLoadingIndicator.setVisibility(View.INVISIBLE);
                             showErrorMessage();
@@ -489,7 +709,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     protected void onRestart() {
         super.onRestart();
         populateSpinnerFromDB(null);
-
+        setupSelectedCityFromViewModel(selectedCity);
     }
 
     @Override
@@ -498,67 +718,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         super.onPause();
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//        tvX.setText(String.valueOf(seekBarX.getProgress()));
-//        tvY.setText(String.valueOf(seekBarY.getProgress()));
-        tvX.setText(String.valueOf(seekBarX.getProgress()));
-        tvY.setText(String.valueOf(seekBarY.getProgress()));
-
-        // Setup piechart data
-        setData(seekBarX.getProgress(), seekBarY.getProgress());
-
-        // Setup stackbarchart data
-        ArrayList<BarEntry> values = new ArrayList<>();
-
-        for (int i = 0; i < seekBarX.getProgress(); i++) {
-            float mul = (seekBarY.getProgress() + 1);
-            float val1 = (float) (Math.random() * mul) + mul / 3;
-            float val2 = (float) (Math.random() * mul) + mul / 3;
-            float val3 = (float) (Math.random() * mul) + mul / 3;
-
-            values.add(new BarEntry(
-                    i,
-                    new float[]{val1, val2, val3}));
-        }
-
-        BarDataSet set1;
-
-        if (barChart.getData() != null &&
-                barChart.getData().getDataSetCount() > 0) {
-            set1 = (BarDataSet) barChart.getData().getDataSetByIndex(0);
-            set1.setValues(values);
-            barChart.getData().notifyDataChanged();
-            barChart.notifyDataSetChanged();
-        } else {
-            set1 = new BarDataSet(values, "Statistics Vienna 2014");
-            set1.setDrawIcons(false);
-            set1.setColors(getColors());
-            set1.setStackLabels(new String[]{"Births", "Divorces", "Marriages"});
-
-            ArrayList<IBarDataSet> dataSets = new ArrayList<>();
-            dataSets.add(set1);
-
-            BarData data = new BarData(dataSets);
-            data.setValueFormatter(new StackedValueFormatter(true, "", 1));
-            data.setValueTextColor(Color.WHITE);
-
-            barChart.setData(data);
-        }
-
-        barChart.setFitBars(true);
-        barChart.invalidate();
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
 
     private SpannableString generateCenterSpannableText() {
 
@@ -574,8 +733,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
-        if (e == null)
+        if (e == null) {
             return;
+        }
         Log.i("VAL SELECTED",
                 "Value: " + e.getY() + ", index: " + h.getX()
                         + ", DataSet index: " + h.getDataSetIndex());
@@ -583,59 +743,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onNothingSelected() {
-    }
-
-    private void setData(int count, float range) {
-        ArrayList<PieEntry> entries = new ArrayList<>();
-
-        entries.add(new PieEntry(18.5f, "Green"));
-        entries.add(new PieEntry(26.7f, "Yellow"));
-        entries.add(new PieEntry(24.0f, "Red"));
-        entries.add(new PieEntry(30.8f, "Blue"));
-
-        PieDataSet dataSet = new PieDataSet(entries, "Election Results");
-
-        dataSet.setDrawIcons(false);
-
-        dataSet.setSliceSpace(3f);
-        dataSet.setIconsOffset(new MPPointF(0, 40));
-        dataSet.setSelectionShift(5f);
-
-        // add a lot of colors
-
-        ArrayList<Integer> colors = new ArrayList<>();
-
-        for (int c : ColorTemplate.VORDIPLOM_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.JOYFUL_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.COLORFUL_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.LIBERTY_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.PASTEL_COLORS)
-            colors.add(c);
-
-        colors.add(ColorTemplate.getHoloBlue());
-
-        dataSet.setColors(colors);
-        //dataSet.setSelectionShift(0f);
-
-        PieData data = new PieData(dataSet);
-//        data.setValueFormatter(new PercentFormatter(piechart));
-        data.setValueTextSize(11f);
-        data.setValueTextColor(Color.WHITE);
-        data.setValueTypeface(tfLight);
-        piechart.setData(data);
-
-        // undo all highlights
-        piechart.highlightValues(null);
-
-        piechart.invalidate();
     }
 
 
@@ -647,6 +754,14 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
 
         return colors;
+    }
+
+
+    private void showNoDataMessage() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.no_data_error)
+                .setMessage(R.string.no_data_error_msg)
+                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
 
 }

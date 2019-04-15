@@ -150,6 +150,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    //FIXME This call takes a long time hence rendering of contribution data is delayed
     private void setContributorsData(String cityName) {
         ApiService apiService = RetroClient.getApiService();
 

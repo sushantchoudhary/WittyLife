@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView android:id="@+id/witty_life_scrollview"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:scrollbars="vertical">
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ui.main.ComparisonActivity">
 
     <!--<include-->
@@ -22,7 +31,9 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:animateLayoutChanges="false"
+        android:animateLayoutChanges="true"
+
+
     >
         <LinearLayout
             android:id="@+id/filter_layout"
@@ -31,87 +42,72 @@
             android:orientation="horizontal">
 
         <TextView android:id="@+id/ranking_filter"
-                  style="@style/TextAppearance.AppCompat.Medium"
+                  style="@style/TextAppearance.MaterialComponents.Headline6"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_margin="10dp"
                   android:layout_gravity="center_vertical"
                   android:text="@string/compare_with_city"
-                  tools:text="Compare with city"/>
+                  tools:text="Compare with city"
+        android:textColor="@android:color/white"/>
         </LinearLayout>
 
     </android.support.v7.widget.Toolbar>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/piechart"
+        android:layout_width="300dp"
+        android:layout_height="280dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/piechart"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_above="@+id/stackbar"
-            android:layout_centerInParent="true"
-        />
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@id/stackbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
 
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/stackbar"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_above="@+id/seekBar1"
-            android:layout_centerInParent="true"
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/stackbar"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
 
-        />
+        android:layout_marginBottom="10dp"
 
-        <SeekBar
-            android:id="@+id/seekBar2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="8dp"
-            android:layout_toStartOf="@+id/tvYMax"
-            android:layout_marginEnd="5dp"
-            android:max="200"
-            android:paddingBottom="12dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/piechart"/>
 
-        <SeekBar
-            android:id="@+id/seekBar1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/seekBar2"
-            android:layout_margin="8dp"
-            android:layout_marginBottom="35dp"
-            android:layout_toStartOf="@+id/tvXMax"
-            android:layout_marginEnd="5dp"
-            android:max="25"
-            android:paddingBottom="12dp" />
+    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
 
-        <TextView
-            android:id="@+id/tvXMax"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/seekBar1"
-            android:layout_alignParentEnd="true"
-            android:text="dash"
-            android:layout_marginBottom="15dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="end"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <!--<com.github.mikephil.charting.charts.PieChart-->
+            <!--android:id="@+id/piechart"-->
+            <!--android:layout_width="300dp"-->
+            <!--android:layout_height="280dp"-->
+            <!--android:layout_above="@+id/stackbar"-->
 
-        <TextView
-            android:id="@+id/tvYMax"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/seekBar2"
-            android:layout_alignParentEnd="true"
-            android:text="dash"
-            android:layout_marginBottom="15dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="end"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_marginTop="20dp"-->
+        <!--android:layout_marginBottom="8dp"/>-->
 
-    </RelativeLayout>
+        <!--<com.github.mikephil.charting.charts.BarChart-->
+            <!--android:id="@+id/stackbar"-->
+            <!--android:layout_width="300dp"-->
+            <!--android:layout_height="300dp"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_marginBottom="17dp"-->
+
+        <!--/>-->
+    <!--</RelativeLayout>-->
 
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
@@ -128,3 +124,4 @@
     />
 
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

@@ -36,5 +36,9 @@
     <string name="PP_Index">PP Index</string>
     <string name="compare_title">Compare ranking</string>
     <string name="compare_with_city">Compare with city</string>
+    <string name="no_data_error">No data available</string>
+    <string name="no_data_error_msg">We don\'t have sufficient comparison data for this city. Please
+        select another city.
+    </string>
 
 </resources>

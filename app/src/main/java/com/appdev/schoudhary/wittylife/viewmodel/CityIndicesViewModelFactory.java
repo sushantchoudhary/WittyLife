@@ -15,9 +15,9 @@ public class CityIndicesViewModelFactory extends ViewModelProvider.NewInstanceFa
         this.cityName= cityName;
     }
 
-    @NonNull
-    @Override
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new CityIndicesViewModel(mDB, cityName);
-    }
+//    @NonNull
+//    @Override
+//    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+////        return (T) new CityIndicesViewModel();
+//    }
 }

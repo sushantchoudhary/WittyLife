@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface QOLDao {
     @Query("SELECT * FROM qolranking ORDER BY qualityOfLifeIndex DESC")
-    List<QOLRanking> loadQOlRank();
+    LiveData<List<QOLRanking>> loadQOlRank();
 
     @Query("DELETE FROM qolranking")
     void deleteAllRows();

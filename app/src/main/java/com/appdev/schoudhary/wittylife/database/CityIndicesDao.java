@@ -23,7 +23,7 @@ public interface CityIndicesDao {
     void deleteAllRows();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertIndices(CityIndices cityIndices);
+    long insertIndices(CityIndices cityIndices);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     List<Long> insertIndicesList(List<CityIndices> cityIndices);

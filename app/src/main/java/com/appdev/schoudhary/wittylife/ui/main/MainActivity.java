@@ -2,11 +2,13 @@ package com.appdev.schoudhary.wittylife.ui.main;
 
 import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private MainActivityAdapter mainActivityAdapter;
     private static AppDatabase mDB;
 
-    private List<QOLRanking> rankingList;
+    private LiveData<List<QOLRanking>> rankingList;
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -144,7 +146,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                     @Override
                     public void onNext(DestinationImg destinationImg) {
                         Urls urls = destinationImg.getResults().get(0).getUrls();
-                        mDB.urlDao().insertURL(urls);
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.urlDao().insertURL(urls);
+                        });
                     }
 
                     @Override
@@ -181,11 +185,19 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         DestinationUrlViewModel viewModel = ViewModelProviders.of(this).get(DestinationUrlViewModel.class);
         viewModel.getDestinationUrl().observe(this, destinationUrls -> {
 
-            rankingList = mDB.qolDao().loadQOlRank();
+            AppExecutors.getInstance().diskIO().execute(() -> {
+                        rankingList = mDB.qolDao().loadQOlRank();
+                        rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
+                            @Override
+                            public void onChanged(@Nullable List<QOLRanking> qolRankings) {
+                                mainActivityAdapter = new  MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
+                                mDestinationLayout.setAdapter(mainActivityAdapter);
+                            }
+                        });
 
+                        });
             Log.d(TAG, "Updating urls from LiveData in ViewModel");
-            mainActivityAdapter = new  MainActivityAdapter(rankingList, destinationUrls, MainActivity.this);
-            mDestinationLayout.setAdapter(mainActivityAdapter);
+
             //TODO : Fix this call {Skipping layout, no adapter found..}
 //              layout.setQOLData(destinationUrls);
 

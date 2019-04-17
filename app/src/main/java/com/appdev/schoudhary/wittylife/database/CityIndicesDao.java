@@ -34,7 +34,7 @@ public interface CityIndicesDao {
     @Delete
     void deleteCost(CityIndices cityIndices);
 
-    @Query("SELECT * FROM city_indices WHERE city_name = :name")
+    @Query("SELECT * FROM city_indices WHERE city_name LIKE :name ")
     LiveData<CityIndices> loadCityByName(String name);
 
     @Query("SELECT * FROM city_indices WHERE city_name = :name")

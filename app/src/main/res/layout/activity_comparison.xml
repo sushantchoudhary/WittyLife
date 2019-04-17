@@ -29,7 +29,7 @@
         android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:theme="@style/WittyLife.ActionBarTheme"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:animateLayoutChanges="true"
 
@@ -42,7 +42,7 @@
             android:orientation="horizontal">
 
         <TextView android:id="@+id/ranking_filter"
-                  style="@style/TextAppearance.MaterialComponents.Headline6"
+                  style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_margin="10dp"

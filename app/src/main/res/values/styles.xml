@@ -15,6 +15,9 @@
         <item name="contentInsetEnd">0dp</item>
     </style>
 
-
+    <style name="WittyLife.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <!-- THIS is where you can color the arrow! -->
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
 
 </resources>

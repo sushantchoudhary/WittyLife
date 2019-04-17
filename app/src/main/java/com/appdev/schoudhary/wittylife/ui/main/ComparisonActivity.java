@@ -113,12 +113,10 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         tfLight = Typeface.createFromAsset(getApplicationContext().getAssets(), "OpenSans-Light.ttf");
         tfRegular = Typeface.createFromAsset(getApplicationContext().getAssets(), "Roboto-Regular.ttf");
 
-
         piechart = findViewById(R.id.piechart);
 
         barChart = findViewById(R.id.stackbar);
         barChart.setOnChartValueSelectedListener(this);
-
 
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
@@ -138,9 +136,8 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             selectedCity = savedInstanceState.getString("selectedCity");
             sourceCity = savedInstanceState.getString("sourceCity");
             /**
-             * Updating spinner UI from database
+             * Updating Chart UI from View Model
              */
-//            populateSpinnerFromDB(savedInstanceState);
             setupSelectedCityFromViewModel(selectedCity);
         } else {
             Intent intentFromHome = getIntent();
@@ -158,13 +155,13 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             }
         }
         /**
-         * Setup pie piechart comparison
+         * Setup pie chart comparison
          */
         bindViewPieChart();
 
 
         /**
-         *  Setup stack bar piechart
+         *  Setup stack bar  comparison
          */
         bindViewStackBarChart();
 
@@ -282,7 +279,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String selectedItem = (String) parent.getSelectedItem();
 
-        //FIXME Should live in ViewModel
+        //FIXME Should live in ViewModel, check in Db first then API
         if (spinnerTouched) {
             fetchAndUpdateIndicesFromAPI(selectedItem);
         }
@@ -305,27 +302,28 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             @SuppressLint("DefaultLocale")
             @Override
             public void onChanged(@Nullable CityIndices selectedCityIndices) {
+                if (selectedCityIndices != null) {
+                    if (selectedCityIndices.getSafetyIndex() != null
+                            && selectedCityIndices.getClimateIndex() != null
+                            && sourceCity != null
+                            && !selectedCity.equals(sourceCity)) {
 
-                if (selectedCityIndices.getSafetyIndex() != null
-                        && sourceCity != null
-                        && selectedCityIndices.getClimateIndex() != null
-                        && !selectedCity.equals(sourceCity)) {
-
-                    AppExecutors.getInstance().diskIO().execute(() -> {
-                        CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                bindChartingView(sourceCityIndices, selectedCityIndices);
-                            }
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    bindChartingView(sourceCityIndices, selectedCityIndices);
+                                }
+                            });
                         });
-                    });
-                } else {
-                    //Clear chart when comparison data not found
-                    piechart.clear();
-                    barChart.clear();
-                    piechart.invalidate();
-                    barChart.invalidate();
+                    } else {
+                        //Clear chart when comparison data not found
+                        piechart.clear();
+                        barChart.clear();
+                        piechart.invalidate();
+                        barChart.invalidate();
+                    }
                 }
             }
 

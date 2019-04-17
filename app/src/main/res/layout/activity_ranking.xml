@@ -63,10 +63,10 @@
     <TableLayout
         android:id="@+id/ranking_table_layout"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="150dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
         android:stretchColumns="*"
 
@@ -76,21 +76,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filter_layout"
 
-        android:animateLayoutChanges="false"
-
     >
 
         <TableRow android:id="@+id/ranking_header"
-                  android:layout_width="wrap_content"
+                  android:layout_width="match_parent"
                   android:layout_height="wrap_content"
         >
             <TextView android:id="@+id/ranking_text"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginBottom="5dp"
                       android:layout_marginStart="8dp"
                       android:layout_marginTop="5dp"
+                      android:layout_weight="1"
 
                       android:text="@string/rank"
                       android:textAlignment="center"
@@ -99,38 +98,42 @@
 
             <TextView android:id="@+id/ranking_city"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginBottom="5dp"
-                      android:layout_marginStart="12dp"
+                      android:layout_marginStart="8dp"
                       android:layout_marginTop="5dp"
                       android:text="@string/ranking_city"
                       android:textAlignment="center"
                       android:textSize="16sp"
+                      android:layout_weight="1"
             />
 
             <TextView android:id="@+id/ranking_index"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginBottom="5dp"
-                      android:layout_marginStart="15dp"
+                      android:layout_marginStart="8dp"
                       android:layout_marginTop="5dp"
                       android:text="@string/ranking_qolindex"
                       android:textAlignment="center"
                       android:textSize="16sp"
+                      android:layout_weight="1"
             />
 
             <TextView android:id="@+id/ranking_value"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginBottom="5dp"
-                      android:layout_marginStart="5dp"
+                      android:layout_marginStart="8dp"
                       android:layout_marginTop="5dp"
+                      android:layout_marginEnd="8dp"
                       android:text="@string/PP_Index"
                       android:textAlignment="center"
                       android:textSize="16sp"
+                      android:layout_weight="1"
             />
 
 
@@ -151,18 +154,19 @@
         >
             <TextView android:id="@+id/first_rank"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
+                      android:layout_width="0dp"
+                      android:layout_height="match_parent"
                       android:layout_marginStart="8dp"
                       android:layout_marginTop="10dp"
                       android:text="1"
                       android:textAlignment="center"
                       android:textSize="16sp"
+                      android:layout_weight="1"
             />
 
             <TextView android:id="@+id/first_city"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginEnd="8dp"
                       android:layout_marginStart="20dp"
@@ -170,28 +174,31 @@
                       android:textAlignment="center"
                       android:textSize="16sp"
                       tools:text="Raleigh"
+                      android:layout_weight="1"
             />
 
             <TextView android:id="@+id/first_qol"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
+                      android:layout_width="0dp"
+                      android:layout_height="match_parent"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
                       tools:text="120.00"
+                      android:layout_weight="1"
             />
 
             <TextView android:id="@+id/first_ppindex"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
+                      android:layout_width="0dp"
+                      android:layout_height="match_parent"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
                       tools:text="120.00"
+                      android:layout_weight="1"
             />
 
         </TableRow>
@@ -204,47 +211,52 @@
             android:background="#dadada"
             app:layout_constraintStart_toStartOf="parent"/>
 
-        <TableRow android:id="@+id/healthcare_index_row" android:layout_width="match_parent"
+        <TableRow android:id="@+id/healthcare_index_row"
+                  android:layout_width="match_parent"
                   android:layout_height="match_parent"
         >
             <TextView android:id="@+id/second_rank"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
+                      android:layout_width="0dp"
+                      android:layout_height="match_parent"
                       android:layout_marginStart="8dp"
                       android:layout_marginTop="10dp"
                       android:text="2"
                       android:textAlignment="center"
-                      android:textSize="16sp"/>
+                      android:textSize="16sp"
+            android:layout_weight="1"/>
 
             <TextView android:id="@+id/second_city"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginEnd="8dp"
                       android:layout_marginStart="20dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="San Francisco"/>
+                      tools:text="San Francisco"
+            android:layout_weight="1"/>
             <TextView android:id="@+id/second_qol"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
             <TextView android:id="@+id/second_ppi"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
 
 
         </TableRow>
@@ -262,44 +274,48 @@
         >
             <TextView android:id="@+id/third_rank"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="8dp"
                       android:layout_marginTop="10dp"
                       android:text="3"
                       android:textAlignment="center"
-                      android:textSize="16sp"/>
+                      android:textSize="16sp"
+            android:layout_weight="1"/>
 
 
             <TextView android:id="@+id/third_city"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginEnd="8dp"
                       android:layout_marginStart="20dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="New York"
+            android:layout_weight="1"/>
 
             <TextView android:id="@+id/third_qol"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
             <TextView android:id="@+id/third_ppiindex"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
 
         </TableRow>
 
@@ -313,47 +329,52 @@
 
         <TableRow android:id="@+id/last_row" android:layout_width="match_parent"
                   android:layout_height="match_parent"
+                  android:layout_marginBottom="20dp"
         >
             <TextView android:id="@+id/last_rank"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="8dp"
                       android:layout_marginTop="10dp"
                       android:text="4"
                       android:textAlignment="center"
-                      android:textSize="16sp"/>
+                      android:textSize="16sp"
+            android:layout_weight="1"/>
 
 
             <TextView android:id="@+id/last_city"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginEnd="8dp"
                       android:layout_marginStart="20dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="Dubai"
+            android:layout_weight="1"/>
 
             <TextView android:id="@+id/last_qol"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
             <TextView android:id="@+id/last_ppindex"
                       style="@style/Base.TextAppearance.AppCompat.Headline"
-                      android:layout_width="wrap_content"
+                      android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_marginStart="12dp"
                       android:layout_marginTop="10dp"
                       android:textAlignment="center"
                       android:textSize="16sp"
-                      tools:text="120.00"/>
+                      tools:text="120.00"
+            android:layout_weight="1"/>
 
         </TableRow>
 

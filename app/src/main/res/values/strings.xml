@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WittyLife</string>
     <string name="search_title">Search for your destination</string>
-    <string name="search_hint">Search destination</string>
+    <string name="search_hint">Search destination e.g Sydney</string>
     <string name="goal">What can we help you find?</string>
     <string name="popular_dest_text">Popular destinations</string>
 

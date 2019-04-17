@@ -29,6 +29,8 @@ import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.SearchResultActivity;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.model.City;
+import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.model.DestinationImg;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.Urls;
@@ -41,6 +43,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             setupMainViewModel();
         } else {
             loadDestinationView();
+            loadCitiesFromAPI();
         }
     }
 
@@ -168,6 +172,32 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     }
 
 
+    /**
+     * Load cities from API for city search validation
+     */
+    private void loadCitiesFromAPI() {
+        Observable<CityRecords> callCityRecords;
+        ApiService apiService = RetroClient.getApiService();
+        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
+
+        /**
+         * Fetch city records data from api
+         */
+        //FIXME Long running task, must run as a background service
+        Disposable disposable =  callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(cityRecords -> {
+                    List<City> cities = cityRecords.getCities();
+                    AppExecutors.getInstance().diskIO().execute(() -> {
+                        mDB.cityDao().insertCityList(cities);
+                    });
+                });
+
+        disposables.add(disposable);
+    }
+
+
+
+
     private void showErrorMessage() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.network_error)
@@ -186,16 +216,16 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         viewModel.getDestinationUrl().observe(this, destinationUrls -> {
 
             AppExecutors.getInstance().diskIO().execute(() -> {
-                        rankingList = mDB.qolDao().loadQOlRank();
-                        rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
-                            @Override
-                            public void onChanged(@Nullable List<QOLRanking> qolRankings) {
-                                mainActivityAdapter = new  MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
-                                mDestinationLayout.setAdapter(mainActivityAdapter);
-                            }
-                        });
+                rankingList = mDB.qolDao().loadQOlRank();
+                rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
+                    @Override
+                    public void onChanged(@Nullable List<QOLRanking> qolRankings) {
+                        mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
+                        mDestinationLayout.setAdapter(mainActivityAdapter);
+                    }
+                });
 
-                        });
+            });
             Log.d(TAG, "Updating urls from LiveData in ViewModel");
 
             //TODO : Fix this call {Skipping layout, no adapter found..}
@@ -282,19 +312,34 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
-                return false;
+                return isValidCity(query);
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                return isValidCity(newText);
             }
         });
 
         searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+                searchManager.getSearchableInfo(new ComponentName(this, DetailsActivity.class)));
 
         return true;
+    }
+
+    private Boolean isValidCity(String searchText) {
+        final AtomicReference<Boolean> validCity = new AtomicReference<>(false);
+
+        mDB.cityDao().loadCityByName(searchText).observe(this, new android.arch.lifecycle.Observer<City>() {
+            @Override
+            public void onChanged(@Nullable City city) {
+                if (city != null) {
+                    validCity.set(true);
+                }
+            }
+        });
+
+        return validCity.get();
     }
 
     @Override

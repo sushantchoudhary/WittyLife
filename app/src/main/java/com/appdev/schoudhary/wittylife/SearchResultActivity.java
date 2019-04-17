@@ -37,10 +37,12 @@ public class SearchResultActivity extends AppCompatActivity {
             String query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions recentSuggestions = new SearchRecentSuggestions(
                     this, SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
-            recentSuggestions.clearHistory();
+//            recentSuggestions.clearHistory();
             //TODO : Fix suggestion popup background and enable it again
-//            recentSuggestions.saveRecentQuery(query, null);
+            recentSuggestions.saveRecentQuery(query, null);
             //use the query to search your data somehow
+
+
 
 
         }

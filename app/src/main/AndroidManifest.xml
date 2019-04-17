@@ -24,6 +24,31 @@
             </intent-filter>
         </activity>
         <activity android:name=".SearchResultActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.SEARCH"/>-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW"/>-->
+            <!--</intent-filter>-->
+
+            <!--<meta-data-->
+                <!--android:name="android.app.searchable"-->
+                <!--android:resource="@xml/searchable"/>-->
+        </activity>
+
+        <provider
+            android:name=".SuggestionProvider"
+            android:authorities="com.appdev.schoudhary.wittylife.SuggestionProvider"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.main.DetailsActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.main.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.main.MainActivity"/>
+
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
@@ -34,19 +59,7 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
-        </activity>
 
-        <provider
-            android:name=".SuggestionProvider"
-            android:authorities="com.appdev.schoudhary.wittylife.SuggestionProvider"/>
-
-        <activity
-            android:name=".ui.main.DetailsActivity"
-            android:launchMode="singleTop"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.main.MainActivity"/>
         </activity>
         <activity
             android:name=".ui.main.RankingActivity"
@@ -62,10 +75,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.DetailsActivity"/>
-        </activity>
-        <activity android:name=".ui.main.MPActivity">
-        </activity>
-        <activity android:name=".ui.main.StackBarActivity">
         </activity>
     </application>
 

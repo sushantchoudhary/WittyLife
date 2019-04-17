@@ -1,20 +1,37 @@
 package com.appdev.schoudhary.wittylife.database;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 
+import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
+import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.model.CostRanking;
 import com.appdev.schoudhary.wittylife.model.DestinationIndices;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.Result;
 import com.appdev.schoudhary.wittylife.model.TrafficRanking;
 import com.appdev.schoudhary.wittylife.model.Urls;
+import com.appdev.schoudhary.wittylife.network.ApiService;
+import com.appdev.schoudhary.wittylife.network.RetroClient;
+import com.appdev.schoudhary.wittylife.utils.AppExecutors;
+
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 @Database(entities = {QOLRanking.class, CostRanking.class,
         TrafficRanking.class, Result.class, Urls.class, DestinationIndices.class, City.class, CityIndices.class}, version = 1, exportSchema = false)
@@ -31,7 +48,12 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (LOCK) {
                 Log.d(LOG_TAG, "Creating new witty database");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
-                        AppDatabase.class, DATABASE_NAME).build();
+                        AppDatabase.class, DATABASE_NAME).addCallback(new Callback() {
+                    @Override
+                    public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                        super.onCreate(db);
+                    }
+                }).build();
             }
 
         }

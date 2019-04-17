@@ -32,8 +32,8 @@ public interface CityDao {
     @Delete
     void deleteCity(City city);
 
-    @Query("SELECT * FROM city WHERE cityId = :id")
-    LiveData<City> loadCityById(int id);
+    @Query("SELECT * FROM city WHERE city_name = :name COLLATE NOCASE")
+    LiveData<City> loadCityByName(String name);
 
     @Query("SELECT count(*) FROM city")
     int getRowCount();

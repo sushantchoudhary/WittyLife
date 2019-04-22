@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -19,26 +20,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
-import com.appdev.schoudhary.wittylife.SearchResultActivity;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.model.DestinationImg;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
-import com.appdev.schoudhary.wittylife.model.Urls;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.network.UnsplashApiService;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
-import com.appdev.schoudhary.wittylife.viewmodel.DestinationUrlViewModel;
+import com.appdev.schoudhary.wittylife.viewmodel.DestinationViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -75,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private LiveData<List<QOLRanking>> rankingList;
 
     private CompositeDisposable disposables = new CompositeDisposable();
+
+    final AtomicReference<Boolean> validCity = new AtomicReference<>(false);
 
 
     @Override
@@ -128,6 +132,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
 
+        /**
+         * Clean urls and user table before insertion
+         */
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            mDB.urlDao().deleteAllRows();
+            mDB.photographerDao().deleteAllRows();
+        });
+
         mLoadingIndicator.setVisibility(View.VISIBLE);
 
         callnumbeo.flatMapIterable(it -> it).take(6)
@@ -149,9 +161,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
                     @Override
                     public void onNext(DestinationImg destinationImg) {
-                        Urls urls = destinationImg.getResults().get(0).getUrls();
+//                        Urls urls = destinationImg.getResults().get(0).getUrls();
+//                        User user = destinationImg.getResults().get(0).getUser();
                         AppExecutors.getInstance().diskIO().execute(() -> {
-                            mDB.urlDao().insertURL(urls);
+//                            mDB.urlDao().insertURL(urls);
+//                            mDB.photographerDao().insertUser(user);
+                            mDB.destinationDao().insertDestinationList(destinationImg.getResults());
                         });
                     }
 
@@ -184,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
          * Fetch city records data from api
          */
         //FIXME Long running task, must run as a background service
-        Disposable disposable =  callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(cityRecords -> {
                     List<City> cities = cityRecords.getCities();
                     AppExecutors.getInstance().diskIO().execute(() -> {
@@ -194,8 +209,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         disposables.add(disposable);
     }
-
-
 
 
     private void showErrorMessage() {
@@ -212,11 +225,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
 
     private void setupMainViewModel() {
-        DestinationUrlViewModel viewModel = ViewModelProviders.of(this).get(DestinationUrlViewModel.class);
+        DestinationViewModel viewModel = ViewModelProviders.of(this).get(DestinationViewModel.class);
         viewModel.getDestinationUrl().observe(this, destinationUrls -> {
 
             AppExecutors.getInstance().diskIO().execute(() -> {
                 rankingList = mDB.qolDao().loadQOlRank();
+//                mDB.photographerDao().loaduserById()
                 rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
                     @Override
                     public void onChanged(@Nullable List<QOLRanking> qolRankings) {
@@ -282,8 +296,19 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         searchItem.expandActionView();
 
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setSubmitButtonEnabled(true);
+        searchView.setSubmitButtonEnabled(false);
         searchView.setQueryRefinementEnabled(true);
+
+        //To remove whiteline under the search view widget
+        int searchPlateId = getApplicationContext().getResources().getIdentifier("android:id/search_plate", null, null);
+        ViewGroup viewGroup = searchView.findViewById(searchPlateId);
+        viewGroup.setBackgroundColor(Color.TRANSPARENT);
+
+        //To remove whiteline under the search view submit button
+        int searchSubmitId = getApplicationContext().getResources().getIdentifier("android:id/submit_area", null, null);
+        ViewGroup submitGroup = searchView.findViewById(searchSubmitId);
+        submitGroup.setBackgroundColor(Color.TRANSPARENT);
+
 
         //TODO
 //        searchView.setSuggestionsAdapter();
@@ -312,11 +337,20 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
-                return isValidCity(query);
+                if (validCity.get()) {
+                    return false;
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.no_match_message), Toast.LENGTH_LONG);
+                    toast.show();
+                    return true;
+                }
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                //Invalidate current selection on edit after activity resume
+                validCity.set(false);
+                searchView.setSubmitButtonEnabled(true);
                 return isValidCity(newText);
             }
         });
@@ -328,25 +362,23 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     }
 
     private Boolean isValidCity(String searchText) {
-        final AtomicReference<Boolean> validCity = new AtomicReference<>(false);
 
-        mDB.cityDao().loadCityByName(searchText).observe(this, new android.arch.lifecycle.Observer<City>() {
-            @Override
-            public void onChanged(@Nullable City city) {
-                if (city != null) {
-                    validCity.set(true);
-                }
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            if (mDB.cityDao().loadCityByName(searchText) != null) {
+                validCity.set(true);
             }
         });
-
         return validCity.get();
     }
 
     @Override
     protected void onResume() {
+        super.onResume();
+
         // To bring focus back from SearchView to activity layout
         parentLayout.requestFocus();
-        super.onResume();
+
+//        setupMainViewModel();
     }
 
     @Override
@@ -354,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         super.onPause();
         disposables.clear();
     }
+
 
     //    @Override
 //    public void onBackPressed() {

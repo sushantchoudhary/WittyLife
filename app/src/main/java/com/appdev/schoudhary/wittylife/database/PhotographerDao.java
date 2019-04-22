@@ -8,33 +8,31 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.appdev.schoudhary.wittylife.model.City;
+import com.appdev.schoudhary.wittylife.model.Urls;
+import com.appdev.schoudhary.wittylife.model.User;
 
 import java.util.List;
 
 @Dao
-public interface CityDao {
-    @Query("SELECT * FROM city ")
-    LiveData<List<City>> loadCities();
+public interface PhotographerDao {
+    @Query("SELECT * FROM photographer")
+    LiveData<List<User>> loadAllUsers();
 
-    @Query("DELETE FROM city")
+    @Query("DELETE FROM photographer")
     void deleteAllRows();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertCity(City city);
+    void insertUser(User user);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    List<Long> insertCityList(List<City> cityList);
+    List<Long> insertUserList(List<User> userRecords);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateCity(City city);
+    void updateUser(User user);
 
     @Delete
-    void deleteCity(City city);
+    void deleteUser(User user);
 
-    @Query("SELECT * FROM city WHERE city_name = :name COLLATE NOCASE")
-    City loadCityByName(String name);
-
-    @Query("SELECT count(*) FROM city")
-    int getRowCount();
+    @Query("SELECT * FROM photographer WHERE  user_id= :id")
+    LiveData<User> loaduserById(int id);
 }

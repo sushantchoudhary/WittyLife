@@ -1,12 +1,20 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.TooltipCompat;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
@@ -16,16 +24,20 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import static android.graphics.Typeface.ITALIC;
+
 public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.MainActivityAdapterViewHolder> {
 
 
     private List<Urls> mURLList;
+    private List<Result> mResultList;
+
     private List<QOLRanking> mQOLRanking;
 
     private final MainActivityAdapterOnClickHandler mainActivityAdapterOnClickHandler;
 
-    MainActivityAdapter(List<QOLRanking> mQOLRanking, List<Urls> mURLList, MainActivityAdapterOnClickHandler mainActivityAdapterOnClickHandler) {
-        this.mURLList = mURLList;
+    MainActivityAdapter(List<QOLRanking> mQOLRanking, List<Result> mResultList, MainActivityAdapterOnClickHandler mainActivityAdapterOnClickHandler) {
+        this.mResultList = mResultList;
         this.mQOLRanking = mQOLRanking;
         this.mainActivityAdapterOnClickHandler = mainActivityAdapterOnClickHandler;
 
@@ -44,34 +56,71 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MainActivityAdapterViewHolder mainActivityAdapterViewHolder, int position) {
-        Urls urls = mURLList.get(position);
+        Urls urls = mResultList.get(position).getUrls();
+        String photographer = mResultList.get(position).getUser().getName();
+
+//        Urls urls = mURLList.get(position);
         String destinationImg = urls.getRegular();
+
+        String destinationCity = mQOLRanking.get(position).getCityName();
+
 
         /**
          * Populate the RV with the destination images
          */
-        loadDestinationImages(destinationImg, mainActivityAdapterViewHolder);
+        loadDestinationImages(destinationCity, destinationImg, mainActivityAdapterViewHolder);
 
         /**
          * getValue is always null since call is asynchronous to avoid updating UI on main thread
          */
 //        List<Urls> urlsList = mDB.urlDao().loadAllUrls().getValue();
 
+        /**
+         * Set attribution text for the image
+         */
+        setAttributionText(mainActivityAdapterViewHolder, photographer);
     }
 
-    private void loadDestinationImages(String destinationImg, @NonNull MainActivityAdapterViewHolder mainActivityAdapterViewHolder) {
+    private void setAttributionText(@NonNull MainActivityAdapterViewHolder mainActivityAdapterViewHolder, String photographer) {
+
+//        SpannableString photoString = new SpannableString(photographer);
+//        photoString.setSpan(new UnderlineSpan(), 0, photographer.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        photoString.setSpan(new StyleSpan(ITALIC), 0, photographer.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//        SpannableString splashString = new SpannableString("on Unsplash");
+//        splashString.setSpan(new UnderlineSpan(), 0, "on Unsplash".length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        splashString.setSpan(new StyleSpan(ITALIC), 0, "on Unsplash".length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//
+//        SpannableString attribution = new SpannableString("Photo by " + photoString +" " + splashString) ;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mainActivityAdapterViewHolder.mDestinationImageView.setTooltipText("Photo by " + photographer +" " + "on Unsplash");
+        } else {
+        TooltipCompat.setTooltipText(mainActivityAdapterViewHolder.mDestinationImageView, "Photo by " + photographer + " " + "on Unsplash");
+
+    }
+
+
+    }
+
+    private void loadDestinationImages(String destinationCity, String destinationImg, @NonNull MainActivityAdapterViewHolder mainActivityAdapterViewHolder) {
         Context context = mainActivityAdapterViewHolder.mDestinationImageView.getContext();
         Picasso.with(context)
                 .load(destinationImg)
+                .fit()
                 .placeholder(R.drawable.adamsherez258833unsplash)
                 .error(R.drawable.adamsherez258833unsplash)
                 .transform(new MaskTransformation(context, R.drawable.rounded_convers_transformation))
                 .into(mainActivityAdapterViewHolder.mDestinationImageView);
+
+
+        mainActivityAdapterViewHolder.mDestinationCity.setText(destinationCity);
     }
 
     @Override
     public int getItemCount() {
-        if (null == mURLList) {
+        if (null == mResultList) {
             return 0;
         }
         return 6;
@@ -89,17 +138,22 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     public class MainActivityAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView mDestinationImageView;
+        final TextView mDestinationCity;
+//        final TextView mDestinationUrl;
 
 
         MainActivityAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             mDestinationImageView = itemView.findViewById(R.id.destination_item);
-            itemView.setOnClickListener(this);
+            mDestinationCity= itemView.findViewById(R.id.destination_city);
+//            mDestinationUrl= itemView.findViewById(R.id.destination_url);
+
+            mDestinationImageView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            //FIXME Hacky: Works since order of records from QOLRanking is in sync with order in Urls table
+            //FIXME Works since order of records from QOLRanking is in sync with order in Urls table
             int adapterPosition = getAdapterPosition();
             QOLRanking rankingData = mQOLRanking.get(adapterPosition);
             mainActivityAdapterOnClickHandler.onClick(rankingData);

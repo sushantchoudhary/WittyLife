@@ -392,6 +392,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="1:1"
+        android:theme="@style/progressAccent"
 
     />
 

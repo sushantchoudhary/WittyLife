@@ -1,10 +1,19 @@
 package com.appdev.schoudhary.wittylife.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import javax.annotation.Nonnull;
+
+@Entity(tableName = "photographer")
 public class User implements Parcelable {
 
     public final static Parcelable.Creator<User> CREATOR = new Creator<User>() {
@@ -22,8 +31,11 @@ public class User implements Parcelable {
         }
 
     };
+    @PrimaryKey
+    @ColumnInfo(name = "user_id")
     @SerializedName("id")
     @Expose
+    @NonNull
     private String id;
     @SerializedName("updated_at")
     @Expose
@@ -42,6 +54,7 @@ public class User implements Parcelable {
     private String lastName;
     @SerializedName("twitter_username")
     @Expose
+    @Ignore
     private Object twitterUsername;
     @SerializedName("portfolio_url")
     @Expose
@@ -54,9 +67,11 @@ public class User implements Parcelable {
     private String location;
     @SerializedName("links")
     @Expose
+    @Ignore
     private Links_ links;
     @SerializedName("profile_image")
     @Expose
+    @Ignore
     private ProfileImage profileImage;
     @SerializedName("instagram_username")
     @Expose
@@ -81,12 +96,12 @@ public class User implements Parcelable {
         this.name = ((String) in.readValue((String.class.getClassLoader())));
         this.firstName = ((String) in.readValue((String.class.getClassLoader())));
         this.lastName = ((String) in.readValue((String.class.getClassLoader())));
-        this.twitterUsername = ((Object) in.readValue((Object.class.getClassLoader())));
+//        this.twitterUsername = ((Object) in.readValue((Object.class.getClassLoader())));
         this.portfolioUrl = ((String) in.readValue((String.class.getClassLoader())));
         this.bio = ((String) in.readValue((String.class.getClassLoader())));
         this.location = ((String) in.readValue((String.class.getClassLoader())));
-        this.links = ((Links_) in.readValue((Links_.class.getClassLoader())));
-        this.profileImage = ((ProfileImage) in.readValue((ProfileImage.class.getClassLoader())));
+//        this.links = ((Links_) in.readValue((Links_.class.getClassLoader())));
+//        this.profileImage = ((ProfileImage) in.readValue((ProfileImage.class.getClassLoader())));
         this.instagramUsername = ((String) in.readValue((String.class.getClassLoader())));
         this.totalCollections = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.totalLikes = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -97,15 +112,15 @@ public class User implements Parcelable {
     /**
      * No args constructor for use in serialization
      */
-    public User() {
-    }
+//    public User() {
+//    }
 
     /**
      * @param lastName
-     * @param profileImage
+//     * @param profileImage
      * @param location
      * @param totalPhotos
-     * @param links
+//     * @param links
      * @param totalCollections
      * @param id
      * @param updatedAt
@@ -117,9 +132,9 @@ public class User implements Parcelable {
      * @param name
      * @param acceptedTos
      * @param firstName
-     * @param twitterUsername
+//     * @param twitterUsername
      */
-    public User(String id, String updatedAt, String username, String name, String firstName, String lastName, Object twitterUsername, String portfolioUrl, String bio, String location, Links_ links, ProfileImage profileImage, String instagramUsername, Integer totalCollections, Integer totalLikes, Integer totalPhotos, Boolean acceptedTos) {
+    public User(String id, String updatedAt, String username, String name, String firstName, String lastName, String portfolioUrl, String bio, String location, String instagramUsername, Integer totalCollections, Integer totalLikes, Integer totalPhotos, Boolean acceptedTos) {
         super();
         this.id = id;
         this.updatedAt = updatedAt;
@@ -127,12 +142,12 @@ public class User implements Parcelable {
         this.name = name;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.twitterUsername = twitterUsername;
+//        this.twitterUsername = twitterUsername;
         this.portfolioUrl = portfolioUrl;
         this.bio = bio;
         this.location = location;
-        this.links = links;
-        this.profileImage = profileImage;
+//        this.links = links;
+//        this.profileImage = profileImage;
         this.instagramUsername = instagramUsername;
         this.totalCollections = totalCollections;
         this.totalLikes = totalLikes;
@@ -283,12 +298,12 @@ public class User implements Parcelable {
         dest.writeValue(name);
         dest.writeValue(firstName);
         dest.writeValue(lastName);
-        dest.writeValue(twitterUsername);
+//        dest.writeValue(twitterUsername);
         dest.writeValue(portfolioUrl);
         dest.writeValue(bio);
         dest.writeValue(location);
-        dest.writeValue(links);
-        dest.writeValue(profileImage);
+//        dest.writeValue(links);
+//        dest.writeValue(profileImage);
         dest.writeValue(instagramUsername);
         dest.writeValue(totalCollections);
         dest.writeValue(totalLikes);

@@ -206,6 +206,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     @SuppressLint("DefaultLocale")
+    //FIXME params could be null, handle empty value in the UI
     private void populateUIFromSearch(@Nonnull Float purchasingPowerInclRentIndex,
                                       @Nonnull Float propertyPriceToIncomeRatio,
                                       @Nonnull Float cpiIndex,
@@ -324,9 +325,9 @@ public class DetailsActivity extends AppCompatActivity {
             searchResultCityName = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions recentSuggestions = new SearchRecentSuggestions(
                     this, SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
-//            recentSuggestions.clearHistory();
+            recentSuggestions.clearHistory();
             //TODO : Fix suggestion popup background and enable it again
-            recentSuggestions.saveRecentQuery(searchResultCityName, null);
+//            recentSuggestions.saveRecentQuery(searchResultCityName, null);
             //use the query to search your data somehow
 
             bindSearchUI(searchResultCityName);
@@ -370,33 +371,37 @@ public class DetailsActivity extends AppCompatActivity {
         Disposable disposable = callCityIndices.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(cityIndices -> {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
+                            if (cityIndices.getName() != null) {
+                                mLoadingIndicator.setVisibility(View.INVISIBLE);
 //                             detailsLayout.setVisibility(View.VISIBLE);
 
-                            AppExecutors.getInstance().diskIO().execute(() -> {
-                                //FiXME Primary key could be null, filter before insert
-                                mDB.cityIndicesDao().insertIndices(cityIndices);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //FIXME Null check required
-                                        populateUIFromSearch(cityIndices.getPurchasingPowerInclRentIndex(),
-                                                cityIndices.getPropertyPriceToIncomeRatio(),
-                                                cityIndices.getCpiAndRentIndex(),
-                                                cityIndices.getSafetyIndex(),
-                                                cityIndices.getHealthCareIndex(),
-                                                cityIndices.getTrafficTimeIndex(),
-                                                cityIndices.getPollutionIndex(),
-                                                cityIndices.getClimateIndex());
-                                    }
+                                AppExecutors.getInstance().diskIO().execute(() -> {
+                                    mDB.cityIndicesDao().insertIndices(cityIndices);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //FIXME Null check required
+                                            populateUIFromSearch(cityIndices.getPurchasingPowerInclRentIndex(),
+                                                    cityIndices.getPropertyPriceToIncomeRatio(),
+                                                    cityIndices.getCpiAndRentIndex(),
+                                                    cityIndices.getSafetyIndex(),
+                                                    cityIndices.getHealthCareIndex(),
+                                                    cityIndices.getTrafficTimeIndex(),
+                                                    cityIndices.getPollutionIndex(),
+                                                    cityIndices.getClimateIndex());
+                                        }
+                                    });
                                 });
-                            });
 
-                        }, throwable -> {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
-                            showErrorMessage();
-                        }
+                            }
+
+                            },throwable -> {
+                                mLoadingIndicator.setVisibility(View.INVISIBLE);
+                                showErrorMessage();
+                            }
+
                 );
+
 
 
         disposables.add(disposable);

@@ -2,8 +2,8 @@
     <string name="app_name">WittyLife</string>
     <string name="search_title">Search for your destination</string>
     <string name="search_hint">Search destination e.g Sydney</string>
-    <string name="goal">What can we help you find?</string>
-    <string name="popular_dest_text">Popular destinations</string>
+    <string name="goal">Select your ranking criteria</string>
+    <string name="popular_dest_text">Destinations with high QOL ranking</string>
 
     <string name="qol_message">Quailty of life</string>
     <string name="cost_message">Cost of living</string>
@@ -39,6 +39,9 @@
     <string name="no_data_error">No data available</string>
     <string name="no_data_error_msg">We don\'t have sufficient comparison data for this city. Please
         select another city.
+    </string>
+    <string name="no_match_message">We tried but couldn\'t find a matching city, please search for
+        another city
     </string>
 
 </resources>

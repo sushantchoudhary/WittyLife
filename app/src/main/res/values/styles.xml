@@ -7,7 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/AppThemeToolbar</item>
-
+        <item name="searchViewStyle">@style/WittySearchView</item>
     </style>
 
     <style name="AppThemeToolbar" parent="Widget.AppCompat.Toolbar" >
@@ -18,6 +18,15 @@
     <style name="WittyLife.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <!-- THIS is where you can color the arrow! -->
         <item name="colorControlNormal">@android:color/white</item>
+    </style>
+
+    <style name="progressAccent" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="WittySearchView" parent="Widget.AppCompat.Light.SearchView">
+        <item name="submitBackground">@android:color/transparent</item>
+        <item name="queryBackground">@android:color/transparent</item>
     </style>
 
 </resources>

@@ -20,6 +20,7 @@ import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.Result;
 import com.appdev.schoudhary.wittylife.model.TrafficRanking;
 import com.appdev.schoudhary.wittylife.model.Urls;
+import com.appdev.schoudhary.wittylife.model.User;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
@@ -34,8 +35,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 @Database(entities = {QOLRanking.class, CostRanking.class,
-        TrafficRanking.class, Result.class, Urls.class, DestinationIndices.class, City.class, CityIndices.class}, version = 1, exportSchema = false)
-@TypeConverters({DestinationUrlConverter.class})
+        TrafficRanking.class, Result.class, Urls.class, DestinationIndices.class, City.class, CityIndices.class, User.class}, version = 1, exportSchema = false)
+@TypeConverters({DestinationUrlConverter.class, UserConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
@@ -74,4 +75,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract CityDao cityDao();
 
     public abstract CityIndicesDao cityIndicesDao();
+
+    public abstract PhotographerDao photographerDao();
 }

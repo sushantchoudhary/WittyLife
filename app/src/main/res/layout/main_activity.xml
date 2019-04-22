@@ -80,7 +80,6 @@
                             android:adjustViewBounds="true"
                             android:contentDescription="@string/qolranking"
                             android:elevation="5dp"
-                            android:scaleType="fitXY"
                         />
 
                         <TextView
@@ -93,7 +92,7 @@
                             android:gravity="start|center_horizontal"
                             android:text="@string/qol_message"
                             android:textAlignment="center"
-                            android:textSize="12sp"
+                            android:textSize="16sp"
                         />
 
                     </LinearLayout>
@@ -119,8 +118,6 @@
                             android:adjustViewBounds="true"
                             android:contentDescription="@string/costofliving"
                             android:elevation="5dp"
-                            android:scaleType="fitXY"
-
                         />
 
                         <TextView
@@ -133,7 +130,7 @@
                             android:gravity="start|center_horizontal"
                             android:text="@string/cost_message"
                             android:textAlignment="center"
-                            android:textSize="12sp"
+                            android:textSize="16sp"
 
                         />
 
@@ -162,8 +159,6 @@
                                    android:adjustViewBounds="true"
                                    android:contentDescription="@string/traffic"
                                    android:elevation="5dp"
-                                   android:scaleType="fitXY"
-
                         />
 
                         <TextView
@@ -176,7 +171,7 @@
                             android:gravity="start|center_horizontal"
                             android:text="@string/traffic_message"
                             android:textAlignment="center"
-                            android:textSize="12sp"
+                            android:textSize="16sp"
 
                         />
 
@@ -211,7 +206,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintDimensionRatio="1:1"
-
+            android:theme="@style/progressAccent"
         />
 
         <TextView

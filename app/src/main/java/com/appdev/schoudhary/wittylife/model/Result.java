@@ -97,7 +97,6 @@ public class Result implements Parcelable {
     private List<Object> currentUserCollections = null;
     @SerializedName("user")
     @Expose
-    @Ignore
     private User user;
     @SerializedName("tags")
     @Expose
@@ -132,30 +131,7 @@ public class Result implements Parcelable {
         in.readList(this.photoTags, (com.appdev.schoudhary.wittylife.model.PhotoTag.class.getClassLoader()));
     }
 
-    /**
-     * @param tags
-     * @param currentUserCollections
-     * @param urls
-     * @param width
-     * @param altDescription
-     * @param links
-     * @param id
-     * @param updatedAt
-     * @param height
-     * @param color
-     * @param createdAt
-     * @param description
-     * @param likes
-     * @param photoTags
-     * @param sponsoredImpressionsId
-     * @param categories
-     * @param likedByUser
-     * @param sponsoredBy
-     * @param sponsored
-     * @param user
-     */
     public Result(@NonNull String id, String createdAt, String updatedAt, Integer width, Integer height, String color, Object description, String altDescription, Urls urls, Links links, List<Object> categories, Boolean sponsored, Object sponsoredBy, Object sponsoredImpressionsId, Integer likes, Boolean likedByUser, List<Object> currentUserCollections, User user, List<Tag> tags, List<PhotoTag> photoTags) {
-        super();
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -177,6 +153,7 @@ public class Result implements Parcelable {
         this.tags = tags;
         this.photoTags = photoTags;
     }
+
 
     public Result() {
     }

@@ -118,7 +118,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         barChart = findViewById(R.id.stackbar);
         barChart.setOnChartValueSelectedListener(this);
 
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = findViewById(R.id.compare_loading_indicator);
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
@@ -148,7 +148,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                     /**
                      * Fetching destination ranking from API on destination details loading
                      */
-//                    loadMovieReviewsInDB();
+//                    loadReviewsInDB();
                     fetchAndUpdateIndicesFromAPI(intentFromHome.getStringExtra(Intent.EXTRA_TEXT));
                     fetchAndUpdateSpinner();
                 }
@@ -240,6 +240,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         spinnerItem = menu.findItem(R.id.compare_menu);
         spinner = (Spinner) spinnerItem.getActionView();
 
+
         spinner.setFitsSystemWindows(true);
 
 
@@ -298,60 +299,62 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         viewModel.loadCity(selectedCity);
 
+
         viewModel.getCityIndices().observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
             @SuppressLint("DefaultLocale")
             @Override
             public void onChanged(@Nullable CityIndices selectedCityIndices) {
-                if (selectedCityIndices != null) {
-                    if (selectedCityIndices.getSafetyIndex() != null
-                            && selectedCityIndices.getClimateIndex() != null
-                            && sourceCity != null
-                            && !selectedCity.equals(sourceCity)) {
+                if (selectedCityIndices != null && sourceCity != null) {
 
-                        AppExecutors.getInstance().diskIO().execute(() -> {
-                            CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    bindChartingView(sourceCityIndices, selectedCityIndices);
-                                }
-                            });
-                        });
-                    } else {
-                        //Clear chart when comparison data not found
-                        piechart.clear();
-                        barChart.clear();
-                        piechart.invalidate();
-                        barChart.invalidate();
-                    }
+                    AppExecutors.getInstance().diskIO().execute(() -> {
+                        CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
+
+                        if (selectedCityIndices.getSafetyIndex() != null
+                                && selectedCityIndices.getClimateIndex() != null
+                                && sourceCityIndices != null
+                                && !selectedCity.equals(sourceCity)) {
+
+                            bindChartingView(sourceCityIndices, selectedCityIndices);
+
+                        }
+                    });
+                } else {
+                    clearChartData();
                 }
             }
-
         });
-
-
     }
+
 
     private void bindChartingView(@NonNull CityIndices sourceCityQOLIndex, @NonNull CityIndices selectedCityQOLIndex) {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
+        if (sourceCityQOLIndex.getSafetyIndex() != null && selectedCityQOLIndex.getSafetyIndex() != null) {
+            Float sourceCity = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getSafetyIndex()));
+            Float selectedCity = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getSafetyIndex()));
+            Map<String, Float> qolData = new HashMap<>();
+            qolData.put(sourceCityQOLIndex.getName(), sourceCity);
+            qolData.put(selectedCityQOLIndex.getName(), selectedCity);
 
-        Float sourceCity = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getSafetyIndex()));
-        Float selectedCity = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getSafetyIndex()));
-        Map<String, Float> qolData = new HashMap<>();
-        qolData.put(sourceCityQOLIndex.getName(), sourceCity);
-        qolData.put(selectedCityQOLIndex.getName(), selectedCity);
+            setPieData(qolData);
+        } else {
+            piechart.clear();
+            piechart.invalidate();
+        }
 
-        setPieData(qolData);
+        if (sourceCityQOLIndex.getClimateIndex() != null && selectedCityQOLIndex.getClimateIndex() != null) {
 
-        //FIXME Handle null data from API
-        Float sourceCityClimate = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getClimateIndex()));
-        Float selectedCityClimate = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getClimateIndex()));
-        Map<String, Float> climateData = new HashMap<>();
-        climateData.put(sourceCityQOLIndex.getName(), sourceCityClimate);
-        climateData.put(selectedCityQOLIndex.getName(), selectedCityClimate);
+            Float sourceCityClimate = Float.valueOf(decimalFormat.format(sourceCityQOLIndex.getClimateIndex()));
+            Float selectedCityClimate = Float.valueOf(decimalFormat.format(selectedCityQOLIndex.getClimateIndex()));
+            Map<String, Float> climateData = new HashMap<>();
+            climateData.put(sourceCityQOLIndex.getName(), sourceCityClimate);
+            climateData.put(selectedCityQOLIndex.getName(), selectedCityClimate);
 
-        setStackData(climateData);
+            setStackData(climateData);
+        } else {
+            barChart.clear();
+            barChart.invalidate();
+        }
     }
 
 
@@ -659,31 +662,30 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         Single<CityIndices> callCityIndices;
         ApiService apiService = RetroClient.getApiService();
         callCityIndices = apiService.getCityIndices(BuildConfig.ApiKey, cityName);
-        //FIXME progress bar color is not consistent across app
         mLoadingIndicator.setVisibility(View.VISIBLE);
 
         Disposable disposable = callCityIndices.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(cityIndices -> {
                             mLoadingIndicator.setVisibility(View.INVISIBLE);
+                            if (cityIndices.getName() != null) {
 
-                            AppExecutors.getInstance().diskIO().execute(() -> {
-                                //FiXME Primary key could be null, filter before insert
-                                mDB.cityIndicesDao().insertIndices(cityIndices);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Skipping any comparison  on activity start
-                                        if (cityIndices.getName().contains(sourceCity)) {
-                                            sourceCity = cityIndices.getName();
-                                        } else {
-                                            selectedCity = cityIndices.getName();
-                                            setupSelectedCityFromViewModel(cityIndices.getName());
+                                AppExecutors.getInstance().diskIO().execute(() -> {
+                                    mDB.cityIndicesDao().insertIndices(cityIndices);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Skipping any comparison  on activity start
+                                            if (cityIndices.getName().contains(sourceCity)) {
+                                                sourceCity = cityIndices.getName();
+                                            } else {
+                                                selectedCity = cityIndices.getName();
+                                                setupSelectedCityFromViewModel(cityIndices.getName());
+                                            }
                                         }
-                                    }
+                                    });
                                 });
-                            });
-
+                            }
 
                         }, throwable -> {
                             mLoadingIndicator.setVisibility(View.INVISIBLE);
@@ -760,6 +762,14 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 .setTitle(R.string.no_data_error)
                 .setMessage(R.string.no_data_error_msg)
                 .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
+    }
+
+    private void clearChartData() {
+        //Clear chart when comparison data not found
+        piechart.clear();
+        barChart.clear();
+        piechart.invalidate();
+        barChart.invalidate();
     }
 
 }

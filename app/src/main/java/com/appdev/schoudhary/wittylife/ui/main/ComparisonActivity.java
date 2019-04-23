@@ -316,6 +316,8 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
                             bindChartingView(sourceCityIndices, selectedCityIndices);
 
+                        } else {
+                            clearChartData();
                         }
                     });
                 } else {
@@ -676,7 +678,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                                         @Override
                                         public void run() {
                                             // Skipping any comparison  on activity start
-                                            if (cityIndices.getName().contains(sourceCity)) {
+                                            if (cityIndices.getName().toLowerCase().contains(sourceCity.toLowerCase())) {
                                                 sourceCity = cityIndices.getName();
                                             } else {
                                                 selectedCity = cityIndices.getName();

@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             setupMainViewModel();
         } else {
             loadDestinationView();
-            loadCitiesFromAPI();
+//            loadCitiesFromAPI();
         }
     }
 
@@ -184,30 +183,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                     }
                 });
 
-    }
-
-
-    /**
-     * Load cities from API for city search validation
-     */
-    private void loadCitiesFromAPI() {
-        Observable<CityRecords> callCityRecords;
-        ApiService apiService = RetroClient.getApiService();
-        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
-
-        /**
-         * Fetch city records data from api
-         */
-        //FIXME Long running task, must run as a background service
-        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cityRecords -> {
-                    List<City> cities = cityRecords.getCities();
-                    AppExecutors.getInstance().diskIO().execute(() -> {
-                        mDB.cityDao().insertCityList(cities);
-                    });
-                });
-
-        disposables.add(disposable);
     }
 
 
@@ -448,5 +423,37 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, rankingData);
         startActivity(intentToStartDetailActivity);
+    }
+
+    /**
+     * Load cities from API for city search validation
+     */
+    private void loadCitiesFromAPI() {
+        Observable<CityRecords> callCityRecords;
+        ApiService apiService = RetroClient.getApiService();
+        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
+
+        /**
+         * Fetch city records data from api
+         */
+        //FIXME Long running task, must run as a background service
+//        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(cityRecords -> {
+//                    List<City> cities = cityRecords.getCities();
+//                    AppExecutors.getInstance().diskIO().execute(() -> {
+//                        mDB.cityDao().insertCityList(cities);
+//                    });
+//                });
+
+        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(cityRecords -> {
+                            List<City> cities = cityRecords.getCities();
+                            AppExecutors.getInstance().diskIO().execute(() -> {
+                                mDB.cityDao().insertCityList(cities);
+                            });
+                        }, throwable -> showErrorMessage()
+                );
+
+        disposables.add(disposable);
     }
 }

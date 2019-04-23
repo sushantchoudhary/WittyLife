@@ -16,6 +16,7 @@ import io.reactivex.Observable;
 
 import io.reactivex.Single;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
@@ -42,6 +43,9 @@ public interface ApiService {
 
     @GET("cities")
     Observable<CityRecords> getCityRecords(@Query("api_key") String api_key);
+
+    @GET("cities")
+    Call<CityRecords> getCities(@Query("api_key") String api_key);
 
     @GET("indices")
     Single<CityIndices> getCityIndices(@Query("api_key") String api_key, @Query("query") String city_name);

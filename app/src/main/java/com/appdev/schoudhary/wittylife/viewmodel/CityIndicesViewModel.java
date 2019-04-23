@@ -26,9 +26,7 @@ public class CityIndicesViewModel extends AndroidViewModel {
         super(application);
         Log.d(TAG, "Actively retrieving city indices from database");
         this.appDatabase = AppDatabase.getsInstance(this.getApplication());
-        ;
-//        cityIndicesLiveData = appDatabase.cityIndicesDao().loadCityByName(cityName);
-//        cityIndices = appDatabase.cityIndicesDao().loadCityByNameRaw(cityName);
+
         cityIndicesLiveData = Transformations.switchMap(cityName, new Function<String, LiveData<CityIndices>>() {
             @Override
             public LiveData<CityIndices> apply(String cityName) {

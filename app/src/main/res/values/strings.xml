@@ -5,7 +5,7 @@
     <string name="goal">Select your ranking criteria</string>
     <string name="popular_dest_text">Destinations with high QOL ranking</string>
 
-    <string name="qol_message">Quailty of life</string>
+    <string name="qol_message">Quality of life</string>
     <string name="cost_message">Cost of living</string>
     <string name="traffic_message">Traffic Ranking</string>
 

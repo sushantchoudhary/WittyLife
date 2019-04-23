@@ -188,8 +188,8 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             showErrorMessage();
         }
 
-        ranking_header_index.setText("GroceriesIndex");
-        ranking_header_value.setText("RentIndex");
+        ranking_header_index.setText("Groceries Index");
+        ranking_header_value.setText("Rent Index");
 
         List<TextView> listOfCity = Arrays.asList(topCity, secondCity, thirdCity, lastCity);
         List<TextView> listOfQol = Arrays.asList(topQol, secondQol, thirdQol, lastQol);
@@ -212,8 +212,8 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             showErrorMessage();
         }
 
-        ranking_header_index.setText("Co2EmissionIndex");
-        ranking_header_value.setText("InefficiencyIndex");
+        ranking_header_index.setText("Co2 Emission");
+        ranking_header_value.setText("Inefficiency");
 
         List<TextView> listOfCity = Arrays.asList(topCity, secondCity, thirdCity, lastCity);
         List<TextView> listOfQol = Arrays.asList(topQol, secondQol, thirdQol, lastQol);

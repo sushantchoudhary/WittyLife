@@ -43,5 +43,7 @@
     <string name="no_match_message">We tried but couldn\'t find a matching city, please search for
         another city
     </string>
+    <string name="wittylife_widget">Wittylife Widget</string>
+    <string name="empty_view_text">No ranking data found</string>
 
 </resources>

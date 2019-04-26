@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "733913660427",
+    "firebase_url": "https://wittylife-492e2.firebaseio.com",
+    "project_id": "wittylife-492e2",
+    "storage_bucket": "wittylife-492e2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733913660427:android:2392fe781766bda0",
+        "android_client_info": {
+          "package_name": "com.appdev.schoudhary.wittylife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "733913660427-u4a057fcjeag2tld22snde8105e8ng7b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.appdev.schoudhary.wittylife",
+            "certificate_hash": "ea800792505ef0ba30c4a28572e872a63851d0c9"
+          }
+        },
+        {
+          "client_id": "733913660427-hlvqmr6mif49r9uud9megarr1hiov4sq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSA5cjOUSBUP5Fqyo7EbVjJAEVsMJeRBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "733913660427-hlvqmr6mif49r9uud9megarr1hiov4sq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -40,6 +40,7 @@ import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.network.UnsplashApiService;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationViewModel;
+import com.appdev.schoudhary.wittylife.widget.RankingUpdateService;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -209,8 +210,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
                     @Override
                     public void onChanged(@Nullable List<QOLRanking> qolRankings) {
-                        mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
-                        mDestinationLayout.setAdapter(mainActivityAdapter);
+                        if(qolRankings != null) {
+                            mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
+                            mDestinationLayout.setAdapter(mainActivityAdapter);
+                        }
                     }
                 });
 
@@ -422,6 +425,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         Class destinationClass = DetailsActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, rankingData);
+
+        /**
+         * Pass current top ranking to widget provider
+         */
+        RankingUpdateService.startActionUpdateRanking(getApplicationContext(), rankingData);
+
         startActivity(intentToStartDetailActivity);
     }
 
@@ -437,14 +446,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
          * Fetch city records data from api
          */
         //FIXME Long running task, must run as a background service
-//        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(cityRecords -> {
-//                    List<City> cities = cityRecords.getCities();
-//                    AppExecutors.getInstance().diskIO().execute(() -> {
-//                        mDB.cityDao().insertCityList(cities);
-//                    });
-//                });
-
         Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(cityRecords -> {
                             List<City> cities = cityRecords.getCities();

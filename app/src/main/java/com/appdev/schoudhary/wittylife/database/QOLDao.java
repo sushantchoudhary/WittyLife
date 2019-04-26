@@ -17,6 +17,9 @@ public interface QOLDao {
     @Query("SELECT * FROM qolranking ORDER BY qualityOfLifeIndex DESC")
     LiveData<List<QOLRanking>> loadQOlRank();
 
+    @Query("SELECT * FROM qolranking ORDER BY qualityOfLifeIndex DESC")
+    List<QOLRanking> loadQOlRankRaw();
+
     @Query("DELETE FROM qolranking")
     void deleteAllRows();
 

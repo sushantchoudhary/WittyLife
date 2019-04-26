@@ -63,7 +63,9 @@
         </activity>
         <activity
             android:name=".ui.main.RankingActivity"
-            android:parentActivityName=".ui.main.MainActivity">
+            android:parentActivityName=".ui.main.MainActivity"
+        android:taskAffinity=".Rank"
+        android:autoRemoveFromRecents="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.MainActivity"/>
@@ -76,6 +78,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.DetailsActivity"/>
         </activity>
+
+        <service android:name=".widget.GridWidgetService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <service android:name=".widget.RankingUpdateService"/>
+
+        <receiver android:name=".widget.RankingUpdateWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/wittylife_update_widget_info"/>
+        </receiver>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="47b73cf891217ea967201f70d03dd7264594391e" />
     </application>
 
 </manifest>

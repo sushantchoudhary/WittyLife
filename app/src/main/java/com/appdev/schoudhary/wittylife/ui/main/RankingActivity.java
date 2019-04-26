@@ -3,8 +3,11 @@ package com.appdev.schoudhary.wittylife.ui.main;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -419,5 +422,16 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
         super.onPause();
     }
 
+    // To navigate back to parent activity when RankingActivity is launched from widget
+    // Use taskAffinity in manifest
+    @Override
+    public void onPrepareSupportNavigateUpTaskStack(@NonNull TaskStackBuilder builder) {
+        super.onPrepareSupportNavigateUpTaskStack(builder);
 
+        Context context = this;
+        Class destinationClass =  MainActivity.class;
+        Intent intentToStartMainActivity = new Intent(context, destinationClass);
+        intentToStartMainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intentToStartMainActivity);
+    }
 }

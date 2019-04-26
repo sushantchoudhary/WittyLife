@@ -12,8 +12,10 @@ import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 
+import io.fabric.sdk.android.Fabric;
 import java.io.IOException;
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class WittyLife extends Application {
     @SuppressLint("StaticFieldLeak")
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 

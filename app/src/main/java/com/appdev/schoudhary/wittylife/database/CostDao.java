@@ -9,7 +9,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.appdev.schoudhary.wittylife.model.CostRanking;
-import com.appdev.schoudhary.wittylife.model.QOLRanking;
 
 import java.util.List;
 

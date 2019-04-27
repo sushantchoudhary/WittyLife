@@ -2,7 +2,6 @@ package com.appdev.schoudhary.wittylife.database;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.appdev.schoudhary.wittylife.model.Urls;
 import com.appdev.schoudhary.wittylife.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

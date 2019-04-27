@@ -11,8 +11,6 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.Nonnull;
-
 @Entity(tableName = "photographer")
 public class User implements Parcelable {
 

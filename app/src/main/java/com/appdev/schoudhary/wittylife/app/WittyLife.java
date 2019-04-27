@@ -15,14 +15,10 @@ import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 
-import io.fabric.sdk.android.Fabric;
 import java.io.IOException;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import io.fabric.sdk.android.Fabric;
 import retrofit2.Call;
 import retrofit2.Response;
 

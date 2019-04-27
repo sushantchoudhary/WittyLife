@@ -19,3 +19,22 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+-dontwarn com.squareup.picasso.**
+
+-dontwarn com.squareup.okhttp.internal.**
+
+
+-dontwarn javax.annotation.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
+-dontwarn okhttp3.internal.platform.ConscryptPlatform
+-dontwarn org.codehaus.mojo.animal_sniffer.*
+
+
+
+
+
+
+

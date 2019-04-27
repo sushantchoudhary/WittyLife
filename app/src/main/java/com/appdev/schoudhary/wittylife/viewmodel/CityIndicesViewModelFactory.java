@@ -1,8 +1,6 @@
 package com.appdev.schoudhary.wittylife.viewmodel;
 
-import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
 
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 

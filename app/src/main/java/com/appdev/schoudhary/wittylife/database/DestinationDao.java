@@ -9,7 +9,6 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.Result;
 
 import java.util.List;

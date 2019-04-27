@@ -5,11 +5,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
-import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +18,6 @@ import com.appdev.schoudhary.wittylife.model.Urls;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
-import static android.graphics.Typeface.ITALIC;
 
 public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.MainActivityAdapterViewHolder> {
 

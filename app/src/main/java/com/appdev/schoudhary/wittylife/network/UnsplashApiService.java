@@ -1,12 +1,8 @@
 package com.appdev.schoudhary.wittylife.network;
 
 import com.appdev.schoudhary.wittylife.model.DestinationImg;
-import com.appdev.schoudhary.wittylife.model.Result;
-
-import java.util.List;
 
 import io.reactivex.Observable;
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 

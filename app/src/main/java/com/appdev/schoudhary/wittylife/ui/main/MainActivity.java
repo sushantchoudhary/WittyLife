@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -15,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.TooltipCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,20 +127,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private void loadDestinationView() {
         Observable<List<QOLRanking>> callnumbeo;
 
-        showMoviewGridView();
+        showRankingGridView();
 
         ApiService apiService = RetroClient.getApiService();
         UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
 
         callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
 
-        /**
-         * Clean urls and user table before insertion
-         */
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            mDB.urlDao().deleteAllRows();
-            mDB.photographerDao().deleteAllRows();
-        });
+        clearDatabase();
 
         mLoadingIndicator.setVisibility(View.VISIBLE);
 
@@ -164,8 +160,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 //                        Urls urls = destinationImg.getResults().get(0).getUrls();
 //                        User user = destinationImg.getResults().get(0).getUser();
                         AppExecutors.getInstance().diskIO().execute(() -> {
-//                            mDB.urlDao().insertURL(urls);
-//                            mDB.photographerDao().insertUser(user);
                             mDB.destinationDao().insertDestinationList(destinationImg.getResults());
                         });
                     }
@@ -186,6 +180,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     }
 
+    private void clearDatabase() {
+        /**
+         * Clean database before fresh insertion
+         */
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            mDB.urlDao().deleteAllRows();
+            mDB.photographerDao().deleteAllRows();
+            mDB.qolDao().deleteAllRows();
+            mDB.destinationDao().deleteAllRows();
+        });
+    }
+
 
     private void showErrorMessage() {
         new AlertDialog.Builder(this)
@@ -194,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> finish()).create().show();
     }
 
-    private void showMoviewGridView() {
+    private void showRankingGridView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mDestinationLayout.setVisibility(View.VISIBLE);
     }
@@ -394,29 +400,47 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         Picasso.with(this)
                 .load(R.drawable.larmrmah216854unsplash)
                 .fit()
-                .placeholder(R.drawable.baseline_search_24)
-                .error(R.drawable.baseline_search_24)
+                .placeholder(R.drawable.web_hi_res_512)
+                .error(R.drawable.web_hi_res_512)
                 .transform(new MaskTransformation(this, R.drawable.rounded_convers_transformation))
                 .into(qolranking);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            qolranking.setTooltipText("Photo by " + "Larm Rmah" + "on Unsplash");
+        }
+        TooltipCompat.setTooltipText(qolranking, "Photo by " + "Larm Rmah" + " on Unsplash" );
+
 
         Picasso.with(this)
                 .load(R.drawable.andrefrancoismckenzie557694unsplash)
                 .fit()
-                .placeholder(R.drawable.baseline_search_24)
-                .error(R.drawable.baseline_search_24)
+                .placeholder(R.drawable.web_hi_res_512)
+                .error(R.drawable.web_hi_res_512)
                 .transform(new MaskTransformation(this, R.drawable.rounded_convers_transformation))
 
                 .into(costranking);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            costranking.setTooltipText("Photo by " + "André François McKenzie" + "on Unsplash");
+        }
+        TooltipCompat.setTooltipText(costranking, "Photo by " + "André François McKenzie" + " on Unsplash" );
+
+
         Picasso.with(this)
                 .load(R.drawable.laurenkay322313unsplash)
                 .fit()
-                .placeholder(R.drawable.baseline_search_24)
-                .error(R.drawable.baseline_search_24)
+                .placeholder(R.drawable.web_hi_res_512)
+                .error(R.drawable.web_hi_res_512)
                 .transform(new MaskTransformation(this, R.drawable.rounded_convers_transformation))
 
                 .into(trafficranking);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            trafficranking.setTooltipText("Photo by " + "Lauren Kay" + "on Unsplash");
+        }
+        TooltipCompat.setTooltipText(trafficranking, "Photo by " + "Lauren Kay" + " on Unsplash" );
     }
+
+
 
 
     @Override

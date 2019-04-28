@@ -14,23 +14,22 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
 
 
--dontwarn com.squareup.picasso.**
-
--dontwarn com.squareup.okhttp.internal.**
-
-
+-dontwarn com.squareup.okhttp.**
 -dontwarn javax.annotation.**
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 -dontwarn org.codehaus.mojo.animal_sniffer.*
+
+-dontwarn kotlin.**
+-dontwarn retrofit2.**
 
 
 

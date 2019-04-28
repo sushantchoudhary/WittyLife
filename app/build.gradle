@@ -31,6 +31,8 @@ android {
             debuggable true
             minifyEnabled true
             shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
             buildConfigField 'String', "ApiKey", Numbeo_ApiKey
             resValue 'string', "api_key", Numbeo_ApiKey
             buildConfigField 'String', "UnsplashApiKey", Unsplash_ApiKey

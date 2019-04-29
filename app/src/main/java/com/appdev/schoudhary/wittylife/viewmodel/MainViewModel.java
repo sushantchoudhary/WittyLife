@@ -59,4 +59,6 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<City>> getCityRecords() {
         return cityRecords;
     }
+
+
 }

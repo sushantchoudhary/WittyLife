@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.StrictMode;
+import android.util.Log;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
@@ -75,6 +77,8 @@ public class WittyLife extends Application {
             @Override
             protected void onPostExecute(CityRecords cityRecords) {
                 if( cityRecords != null) {
+                    Log.d("WittyLife", "******* Read onPostExecute on api call***********" );
+
                     List<City> cities = cityRecords.getCities();
                     AppExecutors.getInstance().diskIO().execute(() -> {
                         mDB.cityDao().insertCityList(cities);
@@ -83,6 +87,21 @@ public class WittyLife extends Application {
             }
         }.execute();
 
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()
+                .penaltyFlashScreen()
+                .penaltyLog()
+                .build());
+
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .detectActivityLeaks()
+                .penaltyLog()
+                .penaltyDeath()
+                .build());
     }
 
     public void initializeStetho() {

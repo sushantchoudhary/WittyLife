@@ -304,6 +304,7 @@ public class DetailsActivity extends AppCompatActivity {
                         mShimmerMaxContainer.stopShimmer();
                         mShimmerMaxContainer.setVisibility(View.GONE);
 
+                        // Show button at the end of fetching contrib data
                         floatingActionButton.show();
 
                     }, throwable -> showErrorMessage());
@@ -512,7 +513,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        disposables.dispose();
+        disposables.clear();
         mShimmerMinContainer.stopShimmer();
         mShimmerMaxContainer.stopShimmer();
         super.onPause();

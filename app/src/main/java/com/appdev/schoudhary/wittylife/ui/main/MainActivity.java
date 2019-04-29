@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -43,6 +44,7 @@ import com.appdev.schoudhary.wittylife.network.UnsplashApiService;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationViewModel;
 import com.appdev.schoudhary.wittylife.widget.RankingUpdateService;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -73,8 +75,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     private ConstraintLayout parentLayout;
     private RecyclerView mDestinationLayout;
+    private HorizontalScrollView mRankingsLayout;
     private MainActivityAdapter mainActivityAdapter;
     private static AppDatabase mDB;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private LiveData<List<QOLRanking>> rankingList;
 
@@ -85,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
@@ -101,9 +108,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         costranking = findViewById(R.id.costofliving);
         trafficranking = findViewById(R.id.traffic);
 
-
         mDestinationLayout = findViewById(R.id.rv_populardestination);
         mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
+        mRankingsLayout = findViewById(R.id.ranking_scrollview);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
@@ -114,70 +121,92 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        showRankingGridView();
         setupRankingView();
 
         if (savedInstanceState != null) {
             setupMainViewModel();
         } else {
-            loadDestinationView();
-//            loadCitiesFromAPI();
+            setupMainViewModel();
         }
     }
 
-    private void loadDestinationView() {
-        Observable<List<QOLRanking>> callnumbeo;
-
-        showRankingGridView();
-
-        ApiService apiService = RetroClient.getApiService();
-        UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
-
-        callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
-
+    private void setupMainViewModel() {
+        setRankingsClickListener();
+        //FIXME Move this view model to run only on network fetch
         clearDatabase();
 
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        DestinationViewModel viewModel = ViewModelProviders.of(this).get(DestinationViewModel.class);
 
-        callnumbeo.flatMapIterable(it -> it).take(6)
-                .flatMap(qolRanking -> {
+        viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loading) {
+                if(loading) {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                } else {
+                    mLoadingIndicator.setVisibility(View.GONE);
+                }
+            }
+        });
 
-                    AppExecutors.getInstance().diskIO().execute(() -> mDB.runInTransaction(() -> {
-                        long rowIds = mDB.qolDao().insertQOL(qolRanking);
-                    }));
+        viewModel.getDestinationUrl().observe(this, destinationUrls -> {
 
-                    return unsplashApiService.getDestination(BuildConfig.UnsplashApiKey, qolRanking.getCityName());
-
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<DestinationImg>() {
+            AppExecutors.getInstance().diskIO().execute(() -> {
+                rankingList = mDB.qolDao().loadQOlRank();
+//                mDB.photographerDao().loaduserById()
+                rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-                        disposables.add(d);
-                    }
-
-                    @Override
-                    public void onNext(DestinationImg destinationImg) {
-//                        Urls urls = destinationImg.getResults().get(0).getUrls();
-//                        User user = destinationImg.getResults().get(0).getUser();
-                        AppExecutors.getInstance().diskIO().execute(() -> {
-                            mDB.destinationDao().insertDestinationList(destinationImg.getResults());
-                        });
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        mDestinationLayout.setVisibility(View.INVISIBLE);
-                        showErrorMessage();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        setupMainViewModel();
+                    public void onChanged(@Nullable List<QOLRanking> qolRankings) {
+                        if(qolRankings.size() == destinationUrls.size()) {
+                            mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
+                            mDestinationLayout.setAdapter(mainActivityAdapter);
+                        }
                     }
                 });
 
+            });
+            Log.d(TAG, "Updating urls from LiveData in ViewModel");
+
+            //TODO : Fix this call {Skipping layout, no adapter found..}
+//              layout.setQOLData(destinationUrls);
+        });
+    }
+
+    private void setRankingsClickListener() {
+        /**
+         * Set intent to launch RankingActivity on selecting QOL ranking image
+         */
+        findViewById(R.id.qolranking).setOnClickListener(v -> {
+            Class destinationClass = RankingActivity.class;
+            Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+            intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.QOL);
+            startActivity(intentToStartComparisonActivity);
+        });
+
+        /**
+         * Set intent to launch RankingActivity on selecting Cost of living ranking image
+         */
+        findViewById(R.id.costofliving).setOnClickListener(v -> {
+            Class destinationClass = RankingActivity.class;
+            Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+            intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.COST);
+            startActivity(intentToStartComparisonActivity);
+        });
+
+        /**
+         * Set intent to launch RankingActivity on selecting Traffic ranking image
+         */
+        findViewById(R.id.traffic).setOnClickListener(v -> {
+            Class destinationClass = RankingActivity.class;
+            Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
+//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
+            intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.TRAFFIC);
+            startActivity(intentToStartComparisonActivity);
+        });
     }
 
     private void clearDatabase() {
@@ -202,67 +231,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     private void showRankingGridView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+        mRankingsLayout.setVisibility(View.VISIBLE);
         mDestinationLayout.setVisibility(View.VISIBLE);
     }
 
-
-    private void setupMainViewModel() {
-        DestinationViewModel viewModel = ViewModelProviders.of(this).get(DestinationViewModel.class);
-        viewModel.getDestinationUrl().observe(this, destinationUrls -> {
-
-            AppExecutors.getInstance().diskIO().execute(() -> {
-                rankingList = mDB.qolDao().loadQOlRank();
-//                mDB.photographerDao().loaduserById()
-                rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
-                    @Override
-                    public void onChanged(@Nullable List<QOLRanking> qolRankings) {
-                        if(qolRankings != null) {
-                            mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
-                            mDestinationLayout.setAdapter(mainActivityAdapter);
-                        }
-                    }
-                });
-
-            });
-            Log.d(TAG, "Updating urls from LiveData in ViewModel");
-
-            //TODO : Fix this call {Skipping layout, no adapter found..}
-//              layout.setQOLData(destinationUrls);
-
-            /**
-             * Set intent to launch RankingActivity on selecting QOL ranking image
-             */
-            findViewById(R.id.qolranking).setOnClickListener(v -> {
-                Class destinationClass = RankingActivity.class;
-                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
-//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
-                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.QOL);
-                startActivity(intentToStartComparisonActivity);
-            });
-
-            /**
-             * Set intent to launch RankingActivity on selecting Cost of living ranking image
-             */
-            findViewById(R.id.costofliving).setOnClickListener(v -> {
-                Class destinationClass = RankingActivity.class;
-                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
-//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
-                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.COST);
-                startActivity(intentToStartComparisonActivity);
-            });
-
-            /**
-             * Set intent to launch RankingActivity on selecting Cost of living ranking image
-             */
-            findViewById(R.id.traffic).setOnClickListener(v -> {
-                Class destinationClass = RankingActivity.class;
-                Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
-//                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
-                intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.TRAFFIC);
-                startActivity(intentToStartComparisonActivity);
-            });
-        });
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -322,6 +294,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
                 if (validCity.get()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+                    mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+
                     return false;
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.no_match_message), Toast.LENGTH_LONG);
@@ -366,23 +342,29 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     }
 
     @Override
+    protected void onRestart() {
+//        loadDestinationView();
+        super.onRestart();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         disposables.clear();
     }
 
 
-    //    @Override
-//    public void onBackPressed() {
-//
-//        if(searchView.isIconified() && searchView != null) {
-//            searchView.setIconified(false);
-//            searchView.clearFocus();
-//        } else {
-//            super.onBackPressed();
-//
-//        }
-//    }
+        @Override
+    public void onBackPressed() {
+
+        if(searchView.isIconified() && searchView != null) {
+            searchView.setIconified(false);
+            searchView.clearFocus();
+        } else {
+            super.onBackPressed();
+
+        }
+    }
 
 
     @Override
@@ -481,4 +463,59 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         disposables.add(disposable);
     }
+
+    private void loadDestinationView() {
+        Observable<List<QOLRanking>> callnumbeo;
+
+        showRankingGridView();
+
+        ApiService apiService = RetroClient.getApiService();
+        UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
+
+        callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
+
+        clearDatabase();
+
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+
+        callnumbeo.flatMapIterable(it -> it).take(6)
+                .flatMap(qolRanking -> {
+
+                    AppExecutors.getInstance().diskIO().execute(() -> mDB.runInTransaction(() -> {
+                        long rowIds = mDB.qolDao().insertQOL(qolRanking);
+                    }));
+
+                    return unsplashApiService.getDestination(BuildConfig.UnsplashApiKey, qolRanking.getCityName());
+
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<DestinationImg>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposables.add(d);
+                    }
+
+                    @Override
+                    public void onNext(DestinationImg destinationImg) {
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.destinationDao().insertDestinationList(destinationImg.getResults());
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mLoadingIndicator.setVisibility(View.INVISIBLE);
+                        mDestinationLayout.setVisibility(View.INVISIBLE);
+                        showErrorMessage();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        mLoadingIndicator.setVisibility(View.INVISIBLE);
+                        setupMainViewModel();
+                    }
+                });
+
+    }
+
 }

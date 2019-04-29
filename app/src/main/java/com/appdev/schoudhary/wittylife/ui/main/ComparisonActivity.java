@@ -58,6 +58,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     private Typeface tfRegular;
 
     private Boolean spinnerTouched = false;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
 
     @Override
@@ -123,6 +125,8 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
         cityRecords = new ArrayList<>();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         //FIXME Hack to force onCreateOptionMenu() to load spinner data
         invalidateOptionsMenu();
@@ -239,8 +243,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         spinnerItem = menu.findItem(R.id.compare_menu);
         spinner = (Spinner) spinnerItem.getActionView();
-
-
         spinner.setFitsSystemWindows(true);
 
 
@@ -282,6 +284,11 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         //FIXME Should live in ViewModel, check in Db first then API
         if (spinnerTouched) {
+
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+
             fetchAndUpdateIndicesFromAPI(selectedItem);
         }
         spinnerTouched = false;
@@ -694,8 +701,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                             showErrorMessage();
                         }
                 );
-
-
         disposables.add(disposable);
     }
 

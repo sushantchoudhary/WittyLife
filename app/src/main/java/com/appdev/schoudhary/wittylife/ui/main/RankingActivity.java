@@ -27,6 +27,7 @@ import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,6 +72,8 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
     private ProgressBar mLoadingIndicator;
 
     private static AppDatabase mDB;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
 
 
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -83,6 +86,8 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         spinner = findViewById(R.id.rank_selector);
 
@@ -281,6 +286,11 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
         if (selectedItem.equals(RankingOptions.QOL.getRankingOption())) {
             rankingOption = RankingOptions.QOL;
             setupRankingFromViewModel();
+
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SOURCE, RankingOptions.QOL.getRankingOption());
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
         } else if (selectedItem.equals(RankingOptions.COST.getRankingOption())) {
             rankingOption = RankingOptions.COST;
 
@@ -296,6 +306,11 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
                     }
                 });
             });
+
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SOURCE, RankingOptions.COST.getRankingOption());
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
         } else {
             rankingOption = RankingOptions.TRAFFIC;
 
@@ -311,8 +326,9 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
                 });
 
             });
-
-
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SOURCE, RankingOptions.TRAFFIC.getRankingOption());
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
         }
     }
 

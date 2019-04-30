@@ -116,7 +116,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         if (null == mResultList) {
             return 0;
         }
-        return 6;
+        return 10;
     }
 
     public void setDestinationData(List<Urls> urls) {

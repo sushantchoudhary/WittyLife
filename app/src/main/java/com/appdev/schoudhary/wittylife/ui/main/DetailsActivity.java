@@ -35,6 +35,8 @@ import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
+import com.appdev.schoudhary.wittylife.viewmodel.ContribDataViewModel;
+import com.appdev.schoudhary.wittylife.viewmodel.ContribDataViewModelFactory;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
@@ -246,72 +248,48 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    //FIXME This call takes a long time hence rendering of contribution data is delayed
     @SuppressLint("SetTextI18n")
     private void setContributorsData(String cityName) {
 
         if (contribData != null) {
-            mMinContribText.setVisibility(View.VISIBLE);
-            mMinContribValue.setVisibility(View.VISIBLE);
-
-            mMinContribValue.setText(contribData.second.toString());
-
-            mShimmerMinContainer.stopShimmer();
-            mShimmerMinContainer.setVisibility(View.GONE);
-
-            mMaxContribValue.setVisibility(View.VISIBLE);
-            mMaxContribText.setVisibility(View.VISIBLE);
-
-            mMaxContribValue.setText(contribData.first.toString());
-
-            mShimmerMaxContainer.stopShimmer();
-            mShimmerMaxContainer.setVisibility(View.GONE);
-
-            floatingActionButton.show();
-
+            setContribViewValue();
         } else {
-            ApiService apiService = RetroClient.getApiService();
-
-            Single<CrimeData> crimeDataCall = apiService.getDestinationCrimeData(BuildConfig.ApiKey, cityName);
-            Single<HealthCareData> healthDataCall = apiService.getDestinationHealthData(BuildConfig.ApiKey, cityName);
-            Single<ClimateData> climateDataCall = apiService.getDestinationClimateData(BuildConfig.ApiKey, cityName);
-
-            @SuppressLint("SetTextI18n") Disposable disposable = Single.zip(crimeDataCall, healthDataCall, climateDataCall, (crimeData, healthCareData, climateData) -> {
-                List<Integer> data = Arrays.asList(crimeData.getContributors(), healthCareData.getContributors(), climateData.getContributors());
-                Integer maxValue = data.stream().mapToInt(v -> v).max().getAsInt();
-                Integer minValue = data.stream().mapToInt(v -> v).min().getAsInt();
-
-                return new Pair<>(maxValue, minValue);
-            }).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(contributors -> {
-
-                        contribData = contributors;
-
-                        mMinContribText.setVisibility(View.VISIBLE);
-                        mMinContribValue.setVisibility(View.VISIBLE);
-
-                        mMinContribValue.setText(contributors.second.toString());
-
-                        mShimmerMinContainer.stopShimmer();
-                        mShimmerMinContainer.setVisibility(View.GONE);
-
-                        mMaxContribValue.setVisibility(View.VISIBLE);
-                        mMaxContribText.setVisibility(View.VISIBLE);
-
-                        mMaxContribValue.setText(contributors.first.toString());
-
-                        mShimmerMaxContainer.stopShimmer();
-                        mShimmerMaxContainer.setVisibility(View.GONE);
-
-                        // Show button at the end of fetching contrib data
-                        floatingActionButton.show();
-
-                    }, throwable -> showErrorMessage());
-
-            disposables.add(disposable);
-
+            ContribDataViewModel contribDataViewModel = ViewModelProviders.of(this, new ContribDataViewModelFactory(cityName)).get(ContribDataViewModel.class);
+            contribDataViewModel.getContribData().observe(this, new Observer<Pair<Integer, Integer>>() {
+                @Override
+                public void onChanged(@Nullable Pair<Integer, Integer> contribPair) {
+                    contribData =  contribPair;
+                }
+            });
+            contribDataViewModel.getIsLoading().observe(this, loading -> {
+                if(loading) {
+                    mShimmerMinContainer.startShimmer();
+                    mShimmerMaxContainer.startShimmer();
+                } else if (contribData != null){
+                    setContribViewValue();
+                }
+            });
         }
+    }
+
+    private void setContribViewValue() {
+        mMinContribText.setVisibility(View.VISIBLE);
+        mMinContribValue.setVisibility(View.VISIBLE);
+
+        mMinContribValue.setText(contribData.second.toString());
+
+        mShimmerMinContainer.stopShimmer();
+        mShimmerMinContainer.setVisibility(View.GONE);
+
+        mMaxContribValue.setVisibility(View.VISIBLE);
+        mMaxContribText.setVisibility(View.VISIBLE);
+
+        mMaxContribValue.setText(contribData.first.toString());
+
+        mShimmerMaxContainer.stopShimmer();
+        mShimmerMaxContainer.setVisibility(View.GONE);
+        // Show FAB only after the contribution values have populated
+        floatingActionButton.show();
     }
 
     @Override
@@ -358,7 +336,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
-
+    //FIXME Move this to view model
     private void fetchAndUpdateIndicesFromAPI(String cityName) {
         Single<CityIndices> callCityIndices;
         ApiService apiService = RetroClient.getApiService();
@@ -508,7 +486,6 @@ public class DetailsActivity extends AppCompatActivity {
         super.onResume();
         mShimmerMinContainer.startShimmer();
         mShimmerMaxContainer.startShimmer();
-
     }
 
     @Override

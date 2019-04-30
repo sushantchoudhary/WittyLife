@@ -36,4 +36,7 @@ public interface DestinationDao {
 
     @Query("SELECT * FROM destination_result WHERE  unsplash_id= :id")
     LiveData<Result> loadResultById(int id);
+
+    @Query("SELECT count(*) FROM destination_result")
+    int getRowCount();
 }

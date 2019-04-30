@@ -77,8 +77,6 @@ public class WittyLife extends Application {
             @Override
             protected void onPostExecute(CityRecords cityRecords) {
                 if( cityRecords != null) {
-                    Log.d("WittyLife", "******* Read onPostExecute on api call***********" );
-
                     List<City> cities = cityRecords.getCities();
                     AppExecutors.getInstance().diskIO().execute(() -> {
                         mDB.cityDao().insertCityList(cities);
@@ -87,21 +85,21 @@ public class WittyLife extends Application {
             }
         }.execute();
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                .detectDiskReads()
-                .detectDiskWrites()
-                .detectNetwork()
-                .penaltyFlashScreen()
-                .penaltyLog()
-                .build());
-
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects()
-                .detectLeakedClosableObjects()
-                .detectActivityLeaks()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());
+//        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//                .detectDiskReads()
+//                .detectDiskWrites()
+//                .detectNetwork()
+//                .penaltyFlashScreen()
+//                .penaltyLog()
+//                .build());
+//
+//        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                .detectLeakedSqlLiteObjects()
+//                .detectLeakedClosableObjects()
+//                .detectActivityLeaks()
+//                .penaltyLog()
+//                .penaltyDeath()
+//                .build());
     }
 
     public void initializeStetho() {

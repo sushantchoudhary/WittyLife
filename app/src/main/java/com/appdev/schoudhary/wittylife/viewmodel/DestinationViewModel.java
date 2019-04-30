@@ -18,20 +18,13 @@ import java.util.List;
 public class DestinationViewModel extends AndroidViewModel {
 
     private static final String TAG = DestinationViewModel.class.getSimpleName();
-    private LiveData<List<Result>> destinationUrl;
     private RankingRepository repository ;
-
-    HashMap<QOLRanking, Urls> destinationDetails;
 
     public DestinationViewModel(@NonNull Application application) {
         super(application);
         Log.d(TAG, "Actively retrieving destination images from database");
 
         repository = new RankingRepository(application.getApplicationContext());
-
-        AppDatabase database = AppDatabase.getsInstance(this.getApplication());
-        destinationUrl = database.destinationDao().loadAllImages();
-
     }
 
     public LiveData<List<Result>>  getDestinationUrl() {

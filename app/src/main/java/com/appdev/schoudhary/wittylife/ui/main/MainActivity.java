@@ -135,19 +135,14 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     private void setupMainViewModel() {
         setRankingsClickListener();
-        //FIXME Move this view model to run only on network fetch
-        clearDatabase();
 
         DestinationViewModel viewModel = ViewModelProviders.of(this).get(DestinationViewModel.class);
 
-        viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean loading) {
-                if(loading) {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                } else {
-                    mLoadingIndicator.setVisibility(View.GONE);
-                }
+        viewModel.getIsLoading().observe(this, loading -> {
+            if(loading) {
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+            } else {
+                mLoadingIndicator.setVisibility(View.GONE);
             }
         });
 
@@ -156,13 +151,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             AppExecutors.getInstance().diskIO().execute(() -> {
                 rankingList = mDB.qolDao().loadQOlRank();
 //                mDB.photographerDao().loaduserById()
-                rankingList.observe(this, new android.arch.lifecycle.Observer<List<QOLRanking>>() {
-                    @Override
-                    public void onChanged(@Nullable List<QOLRanking> qolRankings) {
-                        if(qolRankings.size() == destinationUrls.size()) {
-                            mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
-                            mDestinationLayout.setAdapter(mainActivityAdapter);
-                        }
+                rankingList.observe(this, qolRankings -> {
+                    if(qolRankings.size() == 10 && destinationUrls.size() == 10) {
+                        mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
+                        mDestinationLayout.setAdapter(mainActivityAdapter);
                     }
                 });
 
@@ -172,6 +164,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             //TODO : Fix this call {Skipping layout, no adapter found..}
 //              layout.setQOLData(destinationUrls);
         });
+
+
+
+
     }
 
     private void setRankingsClickListener() {
@@ -206,18 +202,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 //                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
             intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.TRAFFIC);
             startActivity(intentToStartComparisonActivity);
-        });
-    }
-
-    private void clearDatabase() {
-        /**
-         * Clean database before fresh insertion
-         */
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            mDB.urlDao().deleteAllRows();
-            mDB.photographerDao().deleteAllRows();
-            mDB.qolDao().deleteAllRows();
-            mDB.destinationDao().deleteAllRows();
         });
     }
 
@@ -473,8 +457,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
 
         callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
-
-        clearDatabase();
 
         mLoadingIndicator.setVisibility(View.VISIBLE);
 

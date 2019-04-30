@@ -2,15 +2,14 @@ package com.appdev.schoudhary.wittylife.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
+import com.appdev.schoudhary.wittylife.model.CityRecords;
 import com.appdev.schoudhary.wittylife.model.Result;
 import com.appdev.schoudhary.wittylife.network.ApiService;
 import com.appdev.schoudhary.wittylife.network.RetroClient;
@@ -18,8 +17,10 @@ import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class CityIndicesRepository {
@@ -32,9 +33,16 @@ public class CityIndicesRepository {
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     public MutableLiveData<CityIndices> cityIndicesMutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<List<City>> cityListMutableLiveData = new MutableLiveData<>();
+
 
     public CityIndicesRepository(Context context) {
         mDB = AppDatabase.getsInstance(context);
+    }
+
+    public LiveData<List<City>> loadCityList() {
+        fetchAndUpdateSpinnerFromAPI();
+        return mDB.cityDao().loadCities();
     }
 
     public LiveData<CityIndices> refreshCityIndicesFromAPI(String cityName) {
@@ -63,13 +71,42 @@ public class CityIndicesRepository {
         return cityIndicesMutableLiveData;
     }
 
+    private void fetchAndUpdateSpinnerFromAPI() {
+        Observable<CityRecords> callCityRecords;
+        ApiService apiService = RetroClient.getApiService();
+        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
+        isLoading.setValue(true);
 
-    private Boolean checkRoomForData() {
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            if (mDB.cityIndicesDao().getRowCount() > 0) {
-                isDBEmpty = false;
-            }
-        });
-        return isDBEmpty;
+        /**
+         * Fetch city records data from api
+         */
+        //FIXME Long running task, must run as a background service
+        callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.Observer<CityRecords>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(CityRecords cityRecords) {
+                        List<City> cities = cityRecords.getCities();
+                        AppExecutors.getInstance().diskIO().execute(() -> {
+                            mDB.cityDao().insertCityList(cities);
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        isLoading.setValue(false);
+                        Log.e("WittyLife", e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        isLoading.setValue(false);
+                    }
+                });
     }
+
+
 }

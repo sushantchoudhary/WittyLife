@@ -11,6 +11,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.repository.CityIndicesRepository;
 
@@ -56,5 +57,9 @@ public class CityIndicesViewModel extends AndroidViewModel {
 
     public LiveData<CityIndices> getCityIndex(String city) {
         return cityIndicesRepository.refreshCityIndicesFromAPI(city);
+    }
+
+    public LiveData<List<City>> getCityList() {
+        return cityIndicesRepository.loadCityList();
     }
 }

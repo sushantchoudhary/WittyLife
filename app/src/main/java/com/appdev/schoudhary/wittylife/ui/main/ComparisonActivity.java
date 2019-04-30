@@ -28,14 +28,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
-import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
-import com.appdev.schoudhary.wittylife.model.CityRecords;
-import com.appdev.schoudhary.wittylife.network.ApiService;
-import com.appdev.schoudhary.wittylife.network.RetroClient;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModel;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
@@ -66,12 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, OnChartValueSelectedListener {
     private static final String TAG = ComparisonActivity.class.getSimpleName();
@@ -646,53 +637,19 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             if (count > 0) {
                 populateSpinnerFromDB(null);
             } else {
-                fetchAndUpdateSpinnerFromAPI();
+                final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
+                viewModel.getCityList().observe(this, new android.arch.lifecycle.Observer<List<City>>() {
+                    @Override
+                    public void onChanged(@Nullable List<City> cityList) {
+                        if (cityList != null) {
+                            cityList.forEach(city -> cityRecords.add(city.getCity()));
+                        }
+                        populateSpinnerData();
+                    }
+                });
             }
         });
     }
-
-    private void fetchAndUpdateSpinnerFromAPI() {
-        Observable<CityRecords> callCityRecords;
-        ApiService apiService = RetroClient.getApiService();
-        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
-//        mLoadingIndicator.setVisibility(View.VISIBLE);
-
-        /**
-         * Fetch city records data from api
-         */
-        //FIXME Long running task, must run as a background service
-        callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CityRecords>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposables.add(d);
-                    }
-
-                    @Override
-                    public void onNext(CityRecords cityRecords) {
-                        List<City> cities = cityRecords.getCities();
-                        AppExecutors.getInstance().diskIO().execute(() -> {
-                            mDB.cityDao().insertCityList(cities);
-                        });
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        showErrorMessage();
-                    }
-
-                    @Override
-                    public void onComplete() {
-//                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        populateSpinnerFromDB(null);
-                    }
-                });
-    }
-
-
-
-
 
     private void showErrorMessage() {
         new AlertDialog.Builder(this)

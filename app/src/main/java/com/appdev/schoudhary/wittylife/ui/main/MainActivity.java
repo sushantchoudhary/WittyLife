@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        setTheme(R.style.AppTheme);
+        setTheme(R.style.AppTheme);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);

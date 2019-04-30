@@ -138,8 +138,8 @@ public class DetailsActivity extends AppCompatActivity {
             // Restore value of members from saved state
             rankingData = savedInstanceState.getParcelable("rankingData");
             searchResultCityName = savedInstanceState.getString("searchResultCityName");
-            contribData = new Pair<>(savedInstanceState.getInt("maxContribData"),
-                    savedInstanceState.getInt("minContribData"));
+//            contribData = new Pair<>(savedInstanceState.getInt("maxContribData"),
+//                    savedInstanceState.getInt("minContribData"));
 
             /**
              * Updating UI from view model
@@ -252,31 +252,36 @@ public class DetailsActivity extends AppCompatActivity {
     private void setContributorsData(String cityName) {
 
         if (contribData != null) {
-            setContribViewValue();
+            setContribViewValue(Objects.requireNonNull(contribData.second.toString()), Objects.requireNonNull(contribData.first.toString()));
         } else {
-            ContribDataViewModel contribDataViewModel = ViewModelProviders.of(this, new ContribDataViewModelFactory(cityName)).get(ContribDataViewModel.class);
-            contribDataViewModel.getContribData().observe(this, new Observer<Pair<Integer, Integer>>() {
-                @Override
-                public void onChanged(@Nullable Pair<Integer, Integer> contribPair) {
-                    contribData =  contribPair;
-                }
-            });
-            contribDataViewModel.getIsLoading().observe(this, loading -> {
-                if(loading) {
-                    mShimmerMinContainer.startShimmer();
-                    mShimmerMaxContainer.startShimmer();
-                } else if (contribData != null){
-                    setContribViewValue();
-                }
-            });
+            setContribDataFromViewModel(cityName);
         }
     }
 
-    private void setContribViewValue() {
+    private void setContribDataFromViewModel(String cityName) {
+        ContribDataViewModel contribDataViewModel = ViewModelProviders.of(this, new ContribDataViewModelFactory(cityName)).get(ContribDataViewModel.class);
+        contribDataViewModel.getContribData().observe(this, new Observer<Pair<Integer, Integer>>() {
+            @Override
+            public void onChanged(@Nullable Pair<Integer, Integer> contribPair) {
+                contribData =  contribPair;
+            }
+        });
+        contribDataViewModel.getIsLoading().observe(this, loading -> {
+            if(loading) {
+                mShimmerMinContainer.startShimmer();
+                mShimmerMaxContainer.startShimmer();
+            } else if (contribData != null){
+                setContribViewValue(contribData.second.toString(), contribData.first.toString());
+            }
+        });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setContribViewValue(String minValue, String maxValue) {
         mMinContribText.setVisibility(View.VISIBLE);
         mMinContribValue.setVisibility(View.VISIBLE);
 
-        mMinContribValue.setText(contribData.second.toString());
+        mMinContribValue.setText(minValue);
 
         mShimmerMinContainer.stopShimmer();
         mShimmerMinContainer.setVisibility(View.GONE);
@@ -284,7 +289,7 @@ public class DetailsActivity extends AppCompatActivity {
         mMaxContribValue.setVisibility(View.VISIBLE);
         mMaxContribText.setVisibility(View.VISIBLE);
 
-        mMaxContribValue.setText(contribData.first.toString());
+        mMaxContribValue.setText(maxValue);
 
         mShimmerMaxContainer.stopShimmer();
         mShimmerMaxContainer.setVisibility(View.GONE);
@@ -404,8 +409,8 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("rankingData", rankingData);
         outState.putString("searchResultCityName", searchResultCityName);
-        outState.putInt("minContribData", contribData.second);
-        outState.putInt("maxContribData", contribData.first);
+//        outState.putInt("minContribData", contribData.second);
+//        outState.putInt("maxContribData", contribData.first);
 
         super.onSaveInstanceState(outState);
         Log.d(TAG, "Saving rankingData in bundle during orientation change");
@@ -417,9 +422,9 @@ public class DetailsActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         rankingData = savedInstanceState.getParcelable("rankingData");
         searchResultCityName = savedInstanceState.getString("searchResultCityName");
-        contribData = new Pair<>(
-                savedInstanceState.getInt("maxContribData"),
-                savedInstanceState.getInt("minContribData"));
+//        contribData = new Pair<>(
+//                savedInstanceState.getInt("maxContribData"),
+//                savedInstanceState.getInt("minContribData"));
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
 

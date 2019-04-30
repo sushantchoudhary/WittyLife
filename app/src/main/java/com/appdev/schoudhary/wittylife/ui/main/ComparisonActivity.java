@@ -68,7 +68,6 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -84,6 +83,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     private String sourceCity;
     private String selectedCity;
+    private Integer currentSelection;
 
     private static AppDatabase mDB;
     private List<String> cityRecords;
@@ -131,30 +131,27 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         //FIXME Hack to force onCreateOptionMenu() to load spinner data
         invalidateOptionsMenu();
 
-
         // Check for existing state after configuration change and restore the layout
         if (savedInstanceState != null) {
             // Restore value of members from saved state
-            cityRecords = savedInstanceState.getStringArrayList("cityRecords");
-//            savedInstanceState.getInt("spinnerPosition");
+//            cityRecords = savedInstanceState.getStringArrayList("cityRecords");
             selectedCity = savedInstanceState.getString("selectedCity");
             sourceCity = savedInstanceState.getString("sourceCity");
+            currentSelection = savedInstanceState.getInt("currentSelection");
             /**
              * Updating Chart UI from View Model
              */
             setupSelectedCityFromViewModel(selectedCity);
+//            fetchAndUpdateSpinner();
         } else {
             Intent intentFromHome = getIntent();
             if (intentFromHome != null) {
                 if (intentFromHome.hasExtra(Intent.EXTRA_TEXT)) {
                     sourceCity = intentFromHome.getStringExtra(Intent.EXTRA_TEXT);
-//                    setupMovieDetailFromViewModel();
                     /**
                      * Fetching destination ranking from API on destination details loading
                      */
-//                    loadReviewsInDB();
-                    fetchAndUpdateIndicesFromAPI(intentFromHome.getStringExtra(Intent.EXTRA_TEXT));
-                    fetchAndUpdateSpinner();
+                    fetchAndUpdateIndices(intentFromHome.getStringExtra(Intent.EXTRA_TEXT));
                 }
             }
         }
@@ -171,15 +168,13 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        outState.putStringArrayList("cityRecords", (ArrayList<String>) cityRecords);
-
+//        outState.putStringArrayList("cityRecords", (ArrayList<String>) cityRecords);
         outState.putString("sourceCity", sourceCity);
         outState.putString("selectedCity", selectedCity);
+        outState.putInt("currentSelection", currentSelection);
 
         Log.d(TAG, "Saving cityRecords in bundle during orientation change");
 
@@ -188,12 +183,11 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        cityRecords = savedInstanceState.getStringArrayList("cityRecords");
-
+//        cityRecords = savedInstanceState.getStringArrayList("cityRecords");
         //FIXME Use viewmodel to save UI state
         sourceCity = savedInstanceState.getString("sourceCity");
         selectedCity = savedInstanceState.getString("selectedCity");
-
+        currentSelection = savedInstanceState.getInt("currentSelection");
 
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
@@ -217,6 +211,10 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        if(currentSelection != null) {
+            spinner.setSelection(currentSelection, true);
+        }
 
         spinner.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -245,7 +243,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         spinner = (Spinner) spinnerItem.getActionView();
         spinner.setFitsSystemWindows(true);
 
-
 //        spinnerItem.expandActionView();
         spinnerItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
@@ -260,10 +257,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         });
 
         //FIXME Hack to avoid NPE on spinner object on config change
-        if (!cityRecords.isEmpty()) {
-            populateSpinnerData();
+        if (spinner.getCount() == 0){
+            fetchAndUpdateSpinner();
         }
-
         return true;
     }
 
@@ -280,6 +276,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        currentSelection = position;
         String selectedItem = (String) parent.getSelectedItem();
 
         //FIXME Should live in ViewModel, check in Db first then API
@@ -289,7 +286,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
 
-            fetchAndUpdateIndicesFromAPI(selectedItem);
+            fetchAndUpdateIndices(selectedItem);
         }
         spinnerTouched = false;
 
@@ -301,11 +298,42 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //                cityRecords -> bindChartingView(cityRecords.first, cityRecords.second));
     }
 
-    private void setupSelectedCityFromViewModel(String selectedCity) {
+    /**
+     * Fetch and update DB with city indices data
+     *
+     * @param cityName
+     */
+    private void fetchAndUpdateIndices(String cityName) {
         final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
 
-        viewModel.loadCity(selectedCity);
+        viewModel.getCityIndex(cityName).observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
+            @Override
+            public void onChanged(@Nullable CityIndices cityIndices) {
+                if (cityIndices != null) {
+                    // Skipping any comparison  on activity start
+                    if (cityIndices.getName().toLowerCase().contains(sourceCity.toLowerCase())) {
+                        sourceCity = cityIndices.getName();
+                    } else {
+                        selectedCity = cityIndices.getName();
+                    }
+                }
+            }
+        });
+        viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loading) {
+                if(loading) {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                } else {
+                    mLoadingIndicator.setVisibility(View.GONE);
+                    setupSelectedCityFromViewModel(selectedCity);
+                }
+            }});
+    }
 
+    private void setupSelectedCityFromViewModel(String currentCity) {
+        final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
+        viewModel.loadCity(currentCity);
 
         viewModel.getCityIndices().observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
             @SuppressLint("DefaultLocale")
@@ -313,20 +341,21 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             public void onChanged(@Nullable CityIndices selectedCityIndices) {
                 if (selectedCityIndices != null && sourceCity != null) {
 
-                    AppExecutors.getInstance().diskIO().execute(() -> {
-                        CityIndices sourceCityIndices = mDB.cityIndicesDao().loadCityByNameRaw(sourceCity);
+                        mDB.cityIndicesDao().loadCityByName(sourceCity).observe(ComparisonActivity.this, new android.arch.lifecycle.Observer<CityIndices>() {
+                            @Override
+                            public void onChanged(@Nullable CityIndices sourceCityIndices) {
+                                if (selectedCityIndices.getSafetyIndex() != null
+                                        && selectedCityIndices.getClimateIndex() != null
+                                        && sourceCityIndices != null
+                                        && !selectedCity.equals(sourceCity)) {
 
-                        if (selectedCityIndices.getSafetyIndex() != null
-                                && selectedCityIndices.getClimateIndex() != null
-                                && sourceCityIndices != null
-                                && !selectedCity.equals(sourceCity)) {
+                                    bindChartingView(sourceCityIndices, selectedCityIndices);
 
-                            bindChartingView(sourceCityIndices, selectedCityIndices);
-
-                        } else {
-                            clearChartData();
-                        }
-                    });
+                                } else {
+                                    clearChartData();
+                                }
+                            }
+                        });
                 } else {
                     clearChartData();
                 }
@@ -662,47 +691,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     }
 
 
-    /**
-     * Fetch and update DB with city indices data
-     *
-     * @param cityName
-     */
-    private void fetchAndUpdateIndicesFromAPI(String cityName) {
-        Single<CityIndices> callCityIndices;
-        ApiService apiService = RetroClient.getApiService();
-        callCityIndices = apiService.getCityIndices(BuildConfig.ApiKey, cityName);
-        mLoadingIndicator.setVisibility(View.VISIBLE);
 
-        Disposable disposable = callCityIndices.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cityIndices -> {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
-                            if (cityIndices.getName() != null) {
-
-                                AppExecutors.getInstance().diskIO().execute(() -> {
-                                    mDB.cityIndicesDao().insertIndices(cityIndices);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // Skipping any comparison  on activity start
-                                            if (cityIndices.getName().toLowerCase().contains(sourceCity.toLowerCase())) {
-                                                sourceCity = cityIndices.getName();
-                                            } else {
-                                                selectedCity = cityIndices.getName();
-                                                setupSelectedCityFromViewModel(cityIndices.getName());
-                                            }
-                                        }
-                                    });
-                                });
-                            }
-
-                        }, throwable -> {
-                            mLoadingIndicator.setVisibility(View.INVISIBLE);
-                            showErrorMessage();
-                        }
-                );
-        disposables.add(disposable);
-    }
 
 
     private void showErrorMessage() {

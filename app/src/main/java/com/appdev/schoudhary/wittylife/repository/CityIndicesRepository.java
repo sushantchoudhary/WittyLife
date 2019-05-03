@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
+import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
@@ -60,12 +61,11 @@ public class CityIndicesRepository {
                                 AppExecutors.getInstance().diskIO().execute(() -> {
                                     mDB.cityIndicesDao().insertIndices(cityIndices);
                                 });
-                                isLoading.setValue(false);
                             }
-
+                            isLoading.setValue(false);
                         }, throwable -> {
                             isLoading.setValue(false);
-                            Log.e("WittyLife", throwable.getMessage());
+                            Log.e(String.valueOf(R.string.app_name), throwable.getMessage());
                         }
                 );
         return cityIndicesMutableLiveData;
@@ -75,7 +75,7 @@ public class CityIndicesRepository {
         Observable<CityRecords> callCityRecords;
         ApiService apiService = RetroClient.getApiService();
         callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
-        isLoading.setValue(true);
+        isLoading.postValue(true);
 
         /**
          * Fetch city records data from api
@@ -98,7 +98,7 @@ public class CityIndicesRepository {
                     @Override
                     public void onError(Throwable e) {
                         isLoading.setValue(false);
-                        Log.e("WittyLife", e.getMessage());
+                        Log.e(String.valueOf(R.string.app_name), e.getMessage());
                     }
 
                     @Override

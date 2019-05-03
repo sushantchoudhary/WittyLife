@@ -453,7 +453,37 @@
             android:theme="@style/progressAccent"
 
         />
+        <!--<RelativeLayout android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/empty_state_view"-->
+        <!--android:visibility="invisible"-->
+        <!--&gt;-->
+            <!--<com.airbnb.lottie.LottieAnimationView-->
+                <!--android:id="@+id/animation_view"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:lottie_autoPlay="true"-->
+                <!--app:lottie_fileName="52-preloader.json"-->
+                <!--app:lottie_loop="true"-->
+                <!--android:layout_centerInParent="true"-->
+            <!--/>-->
+            <!--<TextView android:id="@+id/empty_state_header"-->
+                      <!--style="@style/Base.TextAppearance.AppCompat.Body1"-->
+                      <!--android:layout_width="wrap_content"-->
+                      <!--android:layout_height="wrap_content"-->
+                      <!--android:text="Oh Snapp.. we don't have enough ranking data on this city"-->
+                      <!--android:layout_marginTop="8dp"-->
+                      <!--android:layout_centerInParent="true"-->
+                      <!--android:textSize="18sp"-->
+            <!--/>-->
+        <!--</RelativeLayout>-->
+
+        <include layout="@layout/details_empty_state"
+                 android:visibility="invisible"/>
+
 
     </android.support.constraint.ConstraintLayout>
+
+
 
 </ScrollView>

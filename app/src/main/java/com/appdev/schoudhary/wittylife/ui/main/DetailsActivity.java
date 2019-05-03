@@ -1,7 +1,6 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -10,6 +9,7 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.button.MaterialButton;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,37 +21,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.appdev.schoudhary.wittylife.BuildConfig;
+import com.airbnb.lottie.LottieAnimationView;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.SuggestionProvider;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
-import com.appdev.schoudhary.wittylife.model.ClimateData;
-import com.appdev.schoudhary.wittylife.model.CrimeData;
-import com.appdev.schoudhary.wittylife.model.HealthCareData;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
-import com.appdev.schoudhary.wittylife.network.ApiService;
-import com.appdev.schoudhary.wittylife.network.RetroClient;
-import com.appdev.schoudhary.wittylife.utils.AppExecutors;
+import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModel;
 import com.appdev.schoudhary.wittylife.viewmodel.ContribDataViewModel;
 import com.appdev.schoudhary.wittylife.viewmodel.ContribDataViewModelFactory;
 import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
 import at.grabner.circleprogress.CircleProgressView;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -73,9 +63,17 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView mMinContribText;
     private TextView mMaxContribText;
 
-    private Pair<Integer, Integer> contribData;
+    private Pair<Integer, Integer> contribData = new Pair<>(0, 0);
 
     private FloatingActionButton floatingActionButton;
+    private TableLayout tableLayout;
+    private View headerDivider;
+    private View footerDivider;
+
+    private MaterialButton searchAgain;
+    private TextView emptyStateBody;
+
+    private ConstraintLayout emptyStateView;
 
 
     private static AppDatabase mDB;
@@ -90,9 +88,11 @@ public class DetailsActivity extends AppCompatActivity {
     private CompositeDisposable disposables = new CompositeDisposable();
     private ShareActionProvider shareActionProvider;
 
-    private static String searchResultCityName;
+    private String searchResultCityName;
     private ShimmerFrameLayout mShimmerMinContainer;
     private ShimmerFrameLayout mShimmerMaxContainer;
+
+    private LottieAnimationView lottieAnimationView;
 
 
     @Override
@@ -119,7 +119,17 @@ public class DetailsActivity extends AppCompatActivity {
         mMinContribText = findViewById(R.id.min_contrib_text);
         mMaxContribText = findViewById(R.id.max_contrib_text);
 
+        headerDivider = findViewById(R.id.detail_divider_main);
+        footerDivider = findViewById(R.id.detail_divider_footer);
+
         floatingActionButton = findViewById(R.id.compare_fab);
+
+//        lottieAnimationView = findViewById(R.id.animation_view);
+
+        tableLayout = findViewById(R.id.tableLayout);
+
+        searchAgain = findViewById(R.id.empty_state_header);
+        emptyStateView = findViewById(R.id.empty_state_view);
 
 
         mPPiCircleView = findViewById(R.id.ppiCircleView);
@@ -138,8 +148,8 @@ public class DetailsActivity extends AppCompatActivity {
             // Restore value of members from saved state
             rankingData = savedInstanceState.getParcelable("rankingData");
             searchResultCityName = savedInstanceState.getString("searchResultCityName");
-//            contribData = new Pair<>(savedInstanceState.getInt("maxContribData"),
-//                    savedInstanceState.getInt("minContribData"));
+            contribData = new Pair<>(savedInstanceState.getInt("maxContribData"),
+                    savedInstanceState.getInt("minContribData"));
 
             /**
              * Updating UI from view model
@@ -176,12 +186,15 @@ public class DetailsActivity extends AppCompatActivity {
             intentToStartComparisonActivity.putExtra(Intent.EXTRA_TEXT, name);
             startActivity(intentToStartComparisonActivity);
         });
+
+        searchAgain.setOnClickListener(view -> finish());
     }
 
     @SuppressLint("DefaultLocale")
     private void populateUI(QOLRanking rankingData) {
-        if (rankingData == null) {
-            showErrorMessage();
+        if (rankingData == null || rankingData.getPurchasingPowerInclRentIndex() == null) {
+            startEmptyStateAnimation();
+            return;
         }
 
         Double QOLindex = Math.max(0, 100 + rankingData.getPurchasingPowerInclRentIndex() / 2.5 - (rankingData.getHousePriceToIncomeRatio() * 1.0) - rankingData.getCpiIndex() / 10 + rankingData.getSafetyIndex() / 2.0 + rankingData.getHealthcareIndex() / 2.5 - rankingData.getTrafficTimeIndex() / 2.0 - rankingData.getPollutionIndex() * 2.0 / 3.0 + rankingData.getClimateIndex() / 3.0);
@@ -218,6 +231,13 @@ public class DetailsActivity extends AppCompatActivity {
                                       @Nonnull Float pollutionIndex,
                                       @Nonnull Float climateIndex) {
 
+
+
+        if(purchasingPowerInclRentIndex == null  ) {
+            startEmptyStateAnimation();
+            return;
+        }
+
         Double QOLindex = Math.max(0, 100 + purchasingPowerInclRentIndex / 2.5
                 - (propertyPriceToIncomeRatio * 1.0)
                 - cpiIndex / 10 + safetyIndex / 2.0
@@ -225,6 +245,7 @@ public class DetailsActivity extends AppCompatActivity {
                 - trafficTimeIndex / 2.0
                 - pollutionIndex * 2.0 / 3.0
                 + climateIndex / 3.0);
+
 
         mPPiCircleView.setMaxValue(QOLindex.floatValue());
         mSafetyCircleView.setMaxValue(100);
@@ -248,10 +269,27 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    private void startEmptyStateAnimation() {
+        mDetailHeader.setVisibility(View.INVISIBLE);
+        tableLayout.setVisibility(View.INVISIBLE);
+        mMinContribText.setVisibility(View.INVISIBLE);
+        mMinContribValue.setVisibility(View.INVISIBLE);
+        mMaxContribText.setVisibility(View.INVISIBLE);
+        mMaxContribText.setVisibility(View.INVISIBLE);
+        mShimmerMinContainer.setVisibility(View.INVISIBLE);
+        mShimmerMaxContainer.setVisibility(View.INVISIBLE);
+
+        headerDivider.setVisibility(View.INVISIBLE);
+        footerDivider.setVisibility(View.INVISIBLE);
+
+        emptyStateView.setVisibility(View.VISIBLE);
+
+    }
+
     @SuppressLint("SetTextI18n")
     private void setContributorsData(String cityName) {
 
-        if (contribData != null) {
+        if (contribData != null && contribData.first != 0) {
             setContribViewValue(Objects.requireNonNull(contribData.second.toString()), Objects.requireNonNull(contribData.first.toString()));
         } else {
             setContribDataFromViewModel(cityName);
@@ -336,59 +374,40 @@ public class DetailsActivity extends AppCompatActivity {
                             cityIndices.getPollutionIndex(),
                             cityIndices.getClimateIndex());
                 } else {
-                    fetchAndUpdateIndicesFromAPI(cityName);
+                    fetchAndUpdateIndicesFromViewModel(cityName);
                 }
             }
         });
     }
     //FIXME Move this to view model
-    private void fetchAndUpdateIndicesFromAPI(String cityName) {
-        Single<CityIndices> callCityIndices;
-        ApiService apiService = RetroClient.getApiService();
-        callCityIndices = apiService.getCityIndices(BuildConfig.ApiKey, cityName);
+    private void fetchAndUpdateIndicesFromViewModel(String cityName) {
 
-//        detailsLayout.setVisibility(View.GONE);
+        final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
 
-        //FIXME progress bar color is not consistent across app
-        mLoadingIndicator.setVisibility(View.VISIBLE);
-
-        Disposable disposable = callCityIndices.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cityIndices -> {
-                            if (cityIndices.getName() != null) {
-                                mLoadingIndicator.setVisibility(View.INVISIBLE);
-//                             detailsLayout.setVisibility(View.VISIBLE);
-
-                                AppExecutors.getInstance().diskIO().execute(() -> {
-                                    mDB.cityIndicesDao().insertIndices(cityIndices);
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //FIXME Null check required
-                                            populateUIFromSearch(cityIndices.getPurchasingPowerInclRentIndex(),
-                                                    cityIndices.getPropertyPriceToIncomeRatio(),
-                                                    cityIndices.getCpiAndRentIndex(),
-                                                    cityIndices.getSafetyIndex(),
-                                                    cityIndices.getHealthCareIndex(),
-                                                    cityIndices.getTrafficTimeIndex(),
-                                                    cityIndices.getPollutionIndex(),
-                                                    cityIndices.getClimateIndex());
-                                        }
-                                    });
-                                });
-
-                            }
-
-                            },throwable -> {
-                                mLoadingIndicator.setVisibility(View.INVISIBLE);
-                                showErrorMessage();
-                            }
-
-                );
-
-
-
-        disposables.add(disposable);
+        viewModel.getCityIndex(cityName).observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
+            @Override
+            public void onChanged(@Nullable CityIndices cityIndices) {
+                if (cityIndices != null) {
+                    populateUIFromSearch(cityIndices.getPurchasingPowerInclRentIndex(),
+                            cityIndices.getPropertyPriceToIncomeRatio(),
+                            cityIndices.getCpiAndRentIndex(),
+                            cityIndices.getSafetyIndex(),
+                            cityIndices.getHealthCareIndex(),
+                            cityIndices.getTrafficTimeIndex(),
+                            cityIndices.getPollutionIndex(),
+                            cityIndices.getClimateIndex());
+                }
+            }
+        });
+        viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loading) {
+                if(loading) {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                } else {
+                    mLoadingIndicator.setVisibility(View.GONE);
+                }
+            }});
     }
 
 
@@ -409,8 +428,8 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("rankingData", rankingData);
         outState.putString("searchResultCityName", searchResultCityName);
-//        outState.putInt("minContribData", contribData.second);
-//        outState.putInt("maxContribData", contribData.first);
+        outState.putInt("minContribData", contribData.second);
+        outState.putInt("maxContribData", contribData.first);
 
         super.onSaveInstanceState(outState);
         Log.d(TAG, "Saving rankingData in bundle during orientation change");
@@ -422,9 +441,9 @@ public class DetailsActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         rankingData = savedInstanceState.getParcelable("rankingData");
         searchResultCityName = savedInstanceState.getString("searchResultCityName");
-//        contribData = new Pair<>(
-//                savedInstanceState.getInt("maxContribData"),
-//                savedInstanceState.getInt("minContribData"));
+        contribData = new Pair<>(
+                savedInstanceState.getInt("maxContribData"),
+                savedInstanceState.getInt("minContribData"));
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
 
@@ -451,12 +470,6 @@ public class DetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Call to update the share intent
-//        private void setShareIntent(Intent shareInte          nt) {
-//            if (shareActionProvider != null) {
-//                shareActionProvider.setShareIntent(shareIntent);
-//            }
-//        }
     private Intent createShareRankingIntent() {
 
         String cityName = (searchResultCityName != null) ? searchResultCityName : rankingData.getCityName();
@@ -467,14 +480,6 @@ public class DetailsActivity extends AppCompatActivity {
                 .setText(DESTINATION_URL + cityName)
                 .getIntent(), getString(R.string.action_share));
     }
-
-    private void showErrorMessage() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.network_error)
-                .setMessage(R.string.network_error_msg)
-                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
-    }
-
 
     @Override
     protected void onRestart() {

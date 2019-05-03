@@ -13,10 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,7 +70,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     private String sourceCity;
     private String selectedCity;
-    private Integer currentSelection;
+    private Integer currentSelection = 0;
 
     private static AppDatabase mDB;
     private List<String> cityRecords;
@@ -142,7 +138,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                     /**
                      * Fetching destination ranking from API on destination details loading
                      */
-                    fetchAndUpdateIndices(intentFromHome.getStringExtra(Intent.EXTRA_TEXT));
+                    fetchAndUpdateIndices(sourceCity);
                 }
             }
         }
@@ -210,7 +206,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         spinner.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                System.out.println("Real value selected in spinner.");
+                Log.d(TAG, getString(R.string.real_selection));
                 spinnerTouched = true;
                 return false;
             }
@@ -254,16 +250,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         return true;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int itemId = item.getItemId();
-//        /* Share menu item clicked */
-//        if (itemId == R.id.compare_menu) {
-//            //TODO Load cities from database and network
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -390,7 +376,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     private void bindViewStackBarChart() {
 
         barChart.getDescription().setEnabled(false);
-        barChart.getDescription().setText("Climate Index");
+        barChart.getDescription().setText(getString(R.string.bar_chart_description));
         barChart.getDescription().setTextSize(12f);
 
         // if more than 60 entries are displayed in the piechart, no values will be
@@ -424,7 +410,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //        seekBarX.setProgress(12);
 //        seekBarY.setProgress(100);
 
-        barChart.setNoDataText("No climate data available for comparison");
+        barChart.setNoDataText(getString(R.string.no_barchart_data_message));
         barChart.setNoDataTextColor(R.color.colorAccent);
         Paint paint = barChart.getPaint(Chart.PAINT_INFO);
         paint.setTextSize(32f);
@@ -450,7 +436,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.setUsePercentValues(true);
         piechart.getDescription().setEnabled(true);
         piechart.getDescription().setTextSize(12f);
-        piechart.getDescription().setText("Safety Rating");
+        piechart.getDescription().setText(getString(R.string.piechart_descripttion));
         piechart.setExtraOffsets(10, 20, 10, 10);
 
         piechart.setDragDecelerationFrictionCoef(0.95f);
@@ -509,7 +495,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.setEntryLabelTypeface(tfRegular);
         piechart.setEntryLabelTextSize(10f);
 
-        piechart.setNoDataText("No safety data available for comparison");
+        piechart.setNoDataText(getString(R.string.no_piechart_data_message));
         piechart.setNoDataTextColor(R.color.colorAccent);
         Paint paint = piechart.getPaint(Chart.PAINT_INFO);
         paint.setTextSize(32f);
@@ -540,7 +526,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
         } else {
-            set1 = new BarDataSet(values, "Climate Index");
+            set1 = new BarDataSet(values, getString(R.string.bar_chart_description));
             set1.setDrawIcons(false);
             set1.setColors(getColors());
             set1.setStackLabels(new String[]{stackCity.get(0), stackCity.get(1)});
@@ -571,7 +557,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         qolIndex.forEach((k, v) -> entries.add(new PieEntry(v, k)));
 
 
-        PieDataSet dataSet = new PieDataSet(entries, "Safety Rating");
+        PieDataSet dataSet = new PieDataSet(entries, getString(R.string.piechart_descripttion));
 
         dataSet.setDrawIcons(false);
 
@@ -672,18 +658,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     }
 
 
-    private SpannableString generateCenterSpannableText() {
-
-        SpannableString s = new SpannableString("MPAndroidChart\ndeveloped by Philipp Jahoda");
-        s.setSpan(new RelativeSizeSpan(1.7f), 0, 14, 0);
-        s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
-        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
-        s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
-        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
-        return s;
-    }
-
     @Override
     public void onValueSelected(Entry e, Highlight h) {
         if (e == null) {
@@ -709,13 +683,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         return colors;
     }
 
-
-    private void showNoDataMessage() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.no_data_error)
-                .setMessage(R.string.no_data_error_msg)
-                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
-    }
 
     private void clearChartData() {
         //Clear chart when comparison data not found

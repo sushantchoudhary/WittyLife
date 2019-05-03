@@ -76,17 +76,6 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     private void setAttributionText(@NonNull MainActivityAdapterViewHolder mainActivityAdapterViewHolder, String photographer) {
 
-//        SpannableString photoString = new SpannableString(photographer);
-//        photoString.setSpan(new UnderlineSpan(), 0, photographer.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//        photoString.setSpan(new StyleSpan(ITALIC), 0, photographer.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//
-//        SpannableString splashString = new SpannableString("on Unsplash");
-//        splashString.setSpan(new UnderlineSpan(), 0, "on Unsplash".length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//        splashString.setSpan(new StyleSpan(ITALIC), 0, "on Unsplash".length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//
-//
-//        SpannableString attribution = new SpannableString("Photo by " + photoString +" " + splashString) ;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mainActivityAdapterViewHolder.mDestinationImageView.setTooltipText("Photo by " + photographer +" " + "on Unsplash");
         } else {

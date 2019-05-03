@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
+import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.ClimateData;
 import com.appdev.schoudhary.wittylife.model.CrimeData;
@@ -58,7 +59,7 @@ public class ContributionDataRepository {
                 isLoading.setValue(false);
             }
         }, throwable -> {
-            Log.e("WittyLife", throwable.getMessage());
+            Log.e(String.valueOf(R.string.app_name), throwable.getMessage());
         });
     }
 

@@ -7,4 +7,5 @@ captures/
 app/fabric.properties
 *.log
 *.dex
+.DS_Store
 

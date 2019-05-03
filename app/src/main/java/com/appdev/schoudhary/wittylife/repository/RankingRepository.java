@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
+import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.DestinationImg;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
@@ -33,18 +34,20 @@ public class RankingRepository {
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
 
+    private MutableLiveData<Boolean> result = new MutableLiveData<>();
+
     public RankingRepository(Context context) {
         mDB = AppDatabase.getsInstance(context);
     }
 
     public LiveData<List<Result>> loadDestinationResults() {
-        refreshDestinationFromApi();
+        checkRepoForData();
         return mDB.destinationDao().loadAllImages();
-    }
+        }
 
     private void refreshDestinationFromApi() {
 
-        if (checkRoomForData()) {
+        if (result.getValue() == null) {
             clearDatabase();
             Observable<List<QOLRanking>> callnumbeo;
 
@@ -53,7 +56,7 @@ public class RankingRepository {
 
             callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
 
-            isLoading.setValue(true);
+            isLoading.postValue(true);
 
             callnumbeo.flatMapIterable(it -> it).take(10)
                     .flatMap(qolRanking -> {
@@ -71,6 +74,7 @@ public class RankingRepository {
                         public void onSubscribe(Disposable d) {
 
                         }
+
                         @Override
                         public void onNext(DestinationImg destinationImg) {
                             AppExecutors.getInstance().diskIO().execute(() ->
@@ -79,26 +83,27 @@ public class RankingRepository {
 
                         @Override
                         public void onError(Throwable e) {
-                            Log.e("WittyLife", e.getMessage());
+                            Log.e(String.valueOf(R.string.app_name), e.getMessage());
                         }
 
                         @Override
                         public void onComplete() {
 //                            destinationResults = mDB.destinationDao().loadAllImages().;
                             isLoading.setValue(false);
+                            result.setValue(true);
                         }
                     });
         }
     }
 
-
-    private Boolean checkRoomForData() {
+    private void checkRepoForData() {
         AppExecutors.getInstance().diskIO().execute(() -> {
             if (mDB.destinationDao().getRowCount() > 0) {
-                isDBEmpty = false;
+                result.postValue(true);
+            } else {
+                refreshDestinationFromApi();
             }
         });
-        return isDBEmpty;
     }
 
 

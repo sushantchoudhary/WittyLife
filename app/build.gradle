@@ -116,4 +116,7 @@ dependencies {
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
 
+    def lottieVersion = "2.7.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+
 }

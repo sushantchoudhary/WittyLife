@@ -45,5 +45,20 @@
     </string>
     <string name="wittylife_widget">Wittylife Widget</string>
     <string name="empty_view_text">No ranking data found</string>
+    <string name="real_selection">Real value selected in spinner</string>
+    <string name="bar_chart_description">Climate Index</string>
+    <string name="no_barchart_data_message">No climate data available for comparison</string>
+    <string name="piechart_descripttion">Safety Rating</string>
+    <string name="no_piechart_data_message">No safety data available for comparison</string>
+    <string name="qol_image_tooltip">Photo by Larm Rmah on Unsplash</string>
+    <string name="cost_image_tooltip">Photo by André François McKenzie on Unsplash</string>
+    <string name="traffic_image_tooltip">Photo by Lauren Kay on Unsplash</string>
+    <string name="qol_ranking_title">Top QOL Ranking..</string>
+    <string name="groceries_index">Groceries Index</string>
+    <string name="rent_index">Rent Index</string>
+    <string name="cost_ranking_title">Top Cost Ranking..</string>
+    <string name="co2_emission">Co2 Emission</string>
+    <string name="inefficiency">Inefficiency</string>
+    <string name="traffic_ranking_title">Top Traffic Ranking..</string>
 
 </resources>

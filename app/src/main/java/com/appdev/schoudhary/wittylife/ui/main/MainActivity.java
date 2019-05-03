@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -150,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
             AppExecutors.getInstance().diskIO().execute(() -> {
                 rankingList = mDB.qolDao().loadQOlRank();
-//                mDB.photographerDao().loaduserById()
                 rankingList.observe(this, qolRankings -> {
                     if(qolRankings.size() == 10 && destinationUrls.size() == 10) {
                         mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
@@ -164,10 +162,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             //TODO : Fix this call {Skipping layout, no adapter found..}
 //              layout.setQOLData(destinationUrls);
         });
-
-
-
-
     }
 
     private void setRankingsClickListener() {
@@ -205,13 +199,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         });
     }
 
-
-    private void showErrorMessage() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.network_error)
-                .setMessage(R.string.network_error_msg)
-                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> finish()).create().show();
-    }
 
     private void showRankingGridView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
@@ -266,11 +253,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             }
         });
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
 
-            }
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -371,9 +355,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 .transform(new MaskTransformation(this, R.drawable.rounded_convers_transformation))
                 .into(qolranking);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            qolranking.setTooltipText("Photo by " + "Larm Rmah" + "on Unsplash");
+            qolranking.setTooltipText(getString(R.string.qol_image_tooltip));
         }
-        TooltipCompat.setTooltipText(qolranking, "Photo by " + "Larm Rmah" + " on Unsplash" );
+        TooltipCompat.setTooltipText(qolranking, getString(R.string.qol_image_tooltip) );
 
 
         Picasso.with(this)
@@ -386,9 +370,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 .into(costranking);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            costranking.setTooltipText("Photo by " + "André François McKenzie" + "on Unsplash");
+            costranking.setTooltipText(getString(R.string.cost_image_tooltip));
         }
-        TooltipCompat.setTooltipText(costranking, "Photo by " + "André François McKenzie" + " on Unsplash" );
+        TooltipCompat.setTooltipText(costranking, getString(R.string.cost_image_tooltip) );
 
 
         Picasso.with(this)
@@ -401,9 +385,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 .into(trafficranking);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            trafficranking.setTooltipText("Photo by " + "Lauren Kay" + "on Unsplash");
+            trafficranking.setTooltipText(getString(R.string.traffic_image_tooltip));
         }
-        TooltipCompat.setTooltipText(trafficranking, "Photo by " + "Lauren Kay" + " on Unsplash" );
+        TooltipCompat.setTooltipText(trafficranking, getString(R.string.traffic_image_tooltip) );
     }
 
 
@@ -422,82 +406,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         RankingUpdateService.startActionUpdateRanking(getApplicationContext(), rankingData);
 
         startActivity(intentToStartDetailActivity);
-    }
-
-    /**
-     * Load cities from API for city search validation
-     */
-    private void loadCitiesFromAPI() {
-        Observable<CityRecords> callCityRecords;
-        ApiService apiService = RetroClient.getApiService();
-        callCityRecords = apiService.getCityRecords(BuildConfig.ApiKey);
-
-        /**
-         * Fetch city records data from api
-         */
-        //FIXME Long running task, must run as a background service
-        Disposable disposable = callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cityRecords -> {
-                            List<City> cities = cityRecords.getCities();
-                            AppExecutors.getInstance().diskIO().execute(() -> {
-                                mDB.cityDao().insertCityList(cities);
-                            });
-                        }, throwable -> showErrorMessage()
-                );
-
-        disposables.add(disposable);
-    }
-
-    private void loadDestinationView() {
-        Observable<List<QOLRanking>> callnumbeo;
-
-        showRankingGridView();
-
-        ApiService apiService = RetroClient.getApiService();
-        UnsplashApiService unsplashApiService = RetroClient.getUnsplashApiService();
-
-        callnumbeo = apiService.getQOLRanking(BuildConfig.ApiKey);
-
-        mLoadingIndicator.setVisibility(View.VISIBLE);
-
-        callnumbeo.flatMapIterable(it -> it).take(6)
-                .flatMap(qolRanking -> {
-
-                    AppExecutors.getInstance().diskIO().execute(() -> mDB.runInTransaction(() -> {
-                        long rowIds = mDB.qolDao().insertQOL(qolRanking);
-                    }));
-
-                    return unsplashApiService.getDestination(BuildConfig.UnsplashApiKey, qolRanking.getCityName());
-
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<DestinationImg>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        disposables.add(d);
-                    }
-
-                    @Override
-                    public void onNext(DestinationImg destinationImg) {
-                        AppExecutors.getInstance().diskIO().execute(() -> {
-                            mDB.destinationDao().insertDestinationList(destinationImg.getResults());
-                        });
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        mDestinationLayout.setVisibility(View.INVISIBLE);
-                        showErrorMessage();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mLoadingIndicator.setVisibility(View.INVISIBLE);
-                        setupMainViewModel();
-                    }
-                });
-
     }
 
 }

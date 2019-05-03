@@ -168,7 +168,7 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void populateQOLUI(List<QOLRanking> rankingData) {
 
-        if (rankingData == null) {
+        if (rankingData.size() == 0) {
             showErrorMessage();
         }
 
@@ -185,19 +185,19 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             listOfPpi.get(i).setText(String.format("%.2f", rankingData.get(i).getPurchasingPowerInclRentIndex()));
         }
 
-        this.setTitle("Top QOL Ranking..");
+        this.setTitle(R.string.qol_ranking_title);
 
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void populateCostUI(List<CostRanking> rankingData) {
 
-        if (rankingData == null) {
+        if (rankingData.size() == 0) {
             showErrorMessage();
         }
 
-        ranking_header_index.setText("Groceries Index");
-        ranking_header_value.setText("Rent Index");
+        ranking_header_index.setText(getString(R.string.groceries_index));
+        ranking_header_value.setText(getString(R.string.rent_index));
 
         List<TextView> listOfCity = Arrays.asList(topCity, secondCity, thirdCity, lastCity);
         List<TextView> listOfQol = Arrays.asList(topQol, secondQol, thirdQol, lastQol);
@@ -209,19 +209,19 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             listOfPpi.get(i).setText(String.format("%.2f", rankingData.get(i).getRentIndex()));
         }
 
-        this.setTitle("Top Cost Ranking..");
+        this.setTitle(R.string.cost_ranking_title);
 
     }
 
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void populateTrafficUI(List<TrafficRanking> rankingData) {
 
-        if (rankingData == null) {
+        if (rankingData.size() == 0) {
             showErrorMessage();
         }
 
-        ranking_header_index.setText("Co2 Emission");
-        ranking_header_value.setText("Inefficiency");
+        ranking_header_index.setText(getString(R.string.co2_emission));
+        ranking_header_value.setText(getString(R.string.inefficiency));
 
         List<TextView> listOfCity = Arrays.asList(topCity, secondCity, thirdCity, lastCity);
         List<TextView> listOfQol = Arrays.asList(topQol, secondQol, thirdQol, lastQol);
@@ -233,7 +233,7 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             listOfPpi.get(i).setText(String.format("%.2f", rankingData.get(i).getInefficiencyIndex()));
         }
 
-        this.setTitle("Top Traffic Ranking..");
+        this.setTitle(R.string.traffic_ranking_title);
 
     }
 

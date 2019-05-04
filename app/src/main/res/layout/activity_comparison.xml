@@ -30,10 +30,7 @@
         android:minHeight="?attr/actionBarSize"
         android:elevation="4dp"
         android:theme="@style/WittyLife.ActionBarTheme"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:animateLayoutChanges="true"
-
-
     >
         <LinearLayout
             android:id="@+id/filter_layout"

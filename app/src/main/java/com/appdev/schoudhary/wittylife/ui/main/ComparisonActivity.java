@@ -3,6 +3,7 @@ package com.appdev.schoudhary.wittylife.ui.main;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,17 +13,25 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
@@ -52,8 +61,10 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,13 +235,60 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     public boolean onCreateOptionsMenu(Menu menu) {
         //FIXME Update menu icon color to white
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.comparison_spinner, menu);
 
-        spinnerItem = menu.findItem(R.id.compare_menu);
-        spinner = (Spinner) spinnerItem.getActionView();
-        spinner.setFitsSystemWindows(true);
+        inflater.inflate(R.menu.autocomplete_spinner, menu);
+        spinnerItem = menu.findItem(R.id.auto_menu);
+        View v = spinnerItem.getActionView();
 
-//        spinnerItem.expandActionView();
+        AutoCompleteTextView autoTextView = v.findViewById(R.id.auto_complete);
+        autoTextView.setThreshold(1);
+
+
+
+        autoTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                autoTextView.showDropDown();
+            }
+        });
+
+        /** Setting an action listener */
+        autoTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    Toast.makeText(getBaseContext(), "Search : " + v.getText(), Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
+
+        autoTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                View autoview = getCurrentFocus();
+                if (autoview != null) {
+                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+                }
+            }
+        });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Arrays.asList("New Delhi", "Sydney", "Melbourne", "Patna", "Hobart", "Mumbai") );
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoTextView.setAdapter(adapter);
+
+
+
+
+//        inflater.inflate(R.menu.comparison_spinner, menu);
+//
+//        spinnerItem = menu.findItem(R.id.compare_menu);
+//        spinner = (Spinner) spinnerItem.getActionView();
+//
+////        spinnerItem.expandActionView();
         spinnerItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -242,13 +300,31 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 return true;
             }
         });
-
-        //FIXME Hack to avoid NPE on spinner object on config change
-        if (spinner.getCount() == 0){
-            fetchAndUpdateSpinner();
-        }
+//
+//        spinner.setScrollContainer(true);
+////        spinner.setDropDownWidth(200);
+//
+//        try {
+//           Field popup = Spinner.class.getDeclaredField("mPopup");
+//            popup.setAccessible(true);
+//
+//            // Get private mPopup member variable and try cast to ListPopupWindow
+//            android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(spinner);
+//
+//            // Set popupWindow height to 1000px
+//            popupWindow.setHeight(1000);
+//        } catch (NoSuchFieldException | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        //FIXME Hack to avoid NPE on spinner object on config change
+//        if (spinner.getCount() == 0){
+//            fetchAndUpdateSpinner();
+//        }
         return true;
     }
+
 
 
     @Override
@@ -256,12 +332,19 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         currentSelection = position;
         String selectedItem = (String) parent.getSelectedItem();
 
+
+
         //FIXME Should live in ViewModel, check in Db first then API
         if (spinnerTouched) {
 
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
             mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+
+//            SearchBottomSheetDialogFragment addPhotoBottomDialogFragment =
+//                    SearchBottomSheetDialogFragment.newInstance();
+//            addPhotoBottomDialogFragment.show(getSupportFragmentManager(),
+//                    "search_dialog_fragment");
 
             fetchAndUpdateIndices(selectedItem);
         }
@@ -691,6 +774,8 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.invalidate();
         barChart.invalidate();
     }
+
+
 
 }
 

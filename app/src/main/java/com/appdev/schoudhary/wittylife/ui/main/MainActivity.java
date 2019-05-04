@@ -1,6 +1,5 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
-import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
@@ -23,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,32 +30,22 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
-import com.appdev.schoudhary.wittylife.model.City;
-import com.appdev.schoudhary.wittylife.model.CityRecords;
-import com.appdev.schoudhary.wittylife.model.DestinationImg;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
-import com.appdev.schoudhary.wittylife.network.ApiService;
-import com.appdev.schoudhary.wittylife.network.RetroClient;
-import com.appdev.schoudhary.wittylife.network.UnsplashApiService;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationViewModel;
 import com.appdev.schoudhary.wittylife.widget.RankingUpdateService;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityAdapter.MainActivityAdapterOnClickHandler {

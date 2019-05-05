@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -22,7 +23,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -39,8 +41,7 @@ import com.appdev.schoudhary.wittylife.widget.RankingUpdateService;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -140,7 +141,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             AppExecutors.getInstance().diskIO().execute(() -> {
                 rankingList = mDB.qolDao().loadQOlRank();
                 rankingList.observe(this, qolRankings -> {
-                    if(qolRankings.size() == 10 && destinationUrls.size() == 10) {
+                    if(qolRankings != null && qolRankings.size() == 10 &&
+                            destinationUrls != null &&
+                            destinationUrls.size() == 10) {
                         mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
                         mDestinationLayout.setAdapter(mainActivityAdapter);
                     }
@@ -226,6 +229,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         ViewGroup submitGroup = searchView.findViewById(searchSubmitId);
         submitGroup.setBackgroundColor(Color.TRANSPARENT);
 
+        int searchTextId = getApplicationContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        AutoCompleteTextView searchTextView = searchView.findViewById(searchTextId);
+        try {
+            Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
+            mCursorDrawableRes.setAccessible(true);
+            mCursorDrawableRes.set(searchTextView, R.drawable.cursor);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.getCause();
+        }
 
         //TODO
 //        searchView.setSuggestionsAdapter();
@@ -292,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     @Override
     protected void onResume() {
         super.onResume();
-
         // To bring focus back from SearchView to activity layout
         parentLayout.requestFocus();
 
@@ -320,19 +331,25 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             searchView.clearFocus();
         } else {
             super.onBackPressed();
-
         }
     }
 
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (getCurrentFocus() != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
         }
-        return super.dispatchTouchEvent(ev);
+        return super.dispatchTouchEvent( event );
     }
 
 

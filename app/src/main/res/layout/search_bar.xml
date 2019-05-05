@@ -1,7 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical" >
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
 
     <AutoCompleteTextView
         android:id="@+id/auto_complete"
@@ -9,7 +10,9 @@
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:inputType="text"
-    android:hint="Search city for comparison"
+        android:textCursorDrawable="@drawable/cursor"
+        app:backgroundTint="@android:color/white"
+        android:hint="Enter city name.."
 />
 
 </LinearLayout>

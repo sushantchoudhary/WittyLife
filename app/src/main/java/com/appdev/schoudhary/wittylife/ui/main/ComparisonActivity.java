@@ -13,23 +13,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,27 +58,25 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 
-public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, OnChartValueSelectedListener {
+public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, OnChartValueSelectedListener, TextView.OnEditorActionListener {
     private static final String TAG = ComparisonActivity.class.getSimpleName();
     private ActionBar actionBar;
     private ProgressBar mLoadingIndicator;
-    private Spinner spinner;
+    private AutoCompleteTextView autoTextView;
 
-    private MenuItem spinnerItem;
+    private MenuItem autoTextItem;
 
     private String sourceCity;
     private String selectedCity;
-    private Integer currentSelection = 0;
+    private String currentSelection;
 
     private static AppDatabase mDB;
     private List<String> cityRecords;
@@ -135,7 +130,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //            cityRecords = savedInstanceState.getStringArrayList("cityRecords");
             selectedCity = savedInstanceState.getString("selectedCity");
             sourceCity = savedInstanceState.getString("sourceCity");
-            currentSelection = savedInstanceState.getInt("currentSelection");
+            currentSelection = savedInstanceState.getString("currentSelection");
             /**
              * Updating Chart UI from View Model
              */
@@ -172,7 +167,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //        outState.putStringArrayList("cityRecords", (ArrayList<String>) cityRecords);
         outState.putString("sourceCity", sourceCity);
         outState.putString("selectedCity", selectedCity);
-        outState.putInt("currentSelection", currentSelection);
+        outState.putString("currentSelection", currentSelection);
 
         Log.d(TAG, "Saving cityRecords in bundle during orientation change");
 
@@ -185,7 +180,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         //FIXME Use viewmodel to save UI state
         sourceCity = savedInstanceState.getString("sourceCity");
         selectedCity = savedInstanceState.getString("selectedCity");
-        currentSelection = savedInstanceState.getInt("currentSelection");
+        currentSelection = savedInstanceState.getString("currentSelection");
 
         Log.d(TAG, "Restoring rankingData from bundle during orientation change");
     }
@@ -199,31 +194,33 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 if (cityList != null) {
                     cityList.forEach(city -> cityRecords.add(city.getCity()));
                 }
-                populateSpinnerData();
+                runOnUiThread(() -> populateSpinnerData());
             }
         });
     }
 
     private void populateSpinnerData() {
-        ArrayAdapter adapter = new ArrayAdapter<>(ComparisonActivity.this, android.R.layout.simple_spinner_item, cityRecords);
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cityRecords);
 
-        if(currentSelection != null) {
-            spinner.setSelection(currentSelection, true);
+        autoTextView.setAdapter(adapter);
+
+        if (currentSelection != null) {
+            autoTextView.setText(currentSelection);
         }
 
-        spinner.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d(TAG, getString(R.string.real_selection));
-                spinnerTouched = true;
-                return false;
-            }
-        });
 
-        spinner.setOnItemSelectedListener(ComparisonActivity.this);
+//        autoTextView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                Log.d(TAG, getString(R.string.real_selection));
+//                spinnerTouched = true;
+//                return false;
+//            }
+//        });
+
+
+//        autoTextView.setOnItemSelectedListener(ComparisonActivity.this);
     }
 
     @Override
@@ -237,13 +234,13 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         MenuInflater inflater = getMenuInflater();
 
         inflater.inflate(R.menu.autocomplete_spinner, menu);
-        spinnerItem = menu.findItem(R.id.auto_menu);
-        View v = spinnerItem.getActionView();
+        autoTextItem = menu.findItem(R.id.auto_menu);
+        View v = autoTextItem.getActionView();
 
-        AutoCompleteTextView autoTextView = v.findViewById(R.id.auto_complete);
-        autoTextView.setThreshold(1);
+        autoTextView = v.findViewById(R.id.auto_complete);
+        autoTextView.setThreshold(3);
 
-
+        autoTextView.setTextColor(getResources().getColor(R.color.icons, null));
 
         autoTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,44 +249,46 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             }
         });
 
+        autoTextView.setOnItemClickListener(ComparisonActivity.this);
+        autoTextView.setOnEditorActionListener(ComparisonActivity.this);
+
+
         /** Setting an action listener */
-        autoTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    Toast.makeText(getBaseContext(), "Search : " + v.getText(), Toast.LENGTH_SHORT).show();
-                }
-                return false;
-            }
-        });
+//        autoTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+//                    Toast.makeText(getBaseContext(), "Search : " + v.getText(), Toast.LENGTH_SHORT).show();
+//                }
+//                return false;
+//            }
+//        });
 
-        autoTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                View autoview = getCurrentFocus();
-                if (autoview != null) {
-                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                }
-            }
-        });
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, Arrays.asList("New Delhi", "Sydney", "Melbourne", "Patna", "Hobart", "Mumbai") );
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        autoTextView.setAdapter(adapter);
-
-
-
-
-//        inflater.inflate(R.menu.comparison_spinner, menu);
+//        autoTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //
-//        spinnerItem = menu.findItem(R.id.compare_menu);
-//        spinner = (Spinner) spinnerItem.getActionView();
+//                View autoview = getCurrentFocus();
+//                if(autoview != null) {
+//                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 //
-////        spinnerItem.expandActionView();
-        spinnerItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+//                    inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+//                }
+//
+//                currentSelection = (String) parent.getItemAtPosition(position);
+//                String selectedItem = (String) parent.getItemAtPosition(position);
+//
+//                Bundle bundle = new Bundle();
+//                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem);
+//                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+//
+//                fetchAndUpdateIndices(selectedItem);
+//
+//            }
+//        });
+
+        autoTextItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 return true;
@@ -300,55 +299,37 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 return true;
             }
         });
-//
-//        spinner.setScrollContainer(true);
-////        spinner.setDropDownWidth(200);
-//
-//        try {
-//           Field popup = Spinner.class.getDeclaredField("mPopup");
-//            popup.setAccessible(true);
-//
-//            // Get private mPopup member variable and try cast to ListPopupWindow
-//            android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(spinner);
-//
-//            // Set popupWindow height to 1000px
-//            popupWindow.setHeight(1000);
-//        } catch (NoSuchFieldException | IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-//
-//
+
 //        //FIXME Hack to avoid NPE on spinner object on config change
-//        if (spinner.getCount() == 0){
-//            fetchAndUpdateSpinner();
-//        }
+        if (autoTextView.getAdapter() == null || autoTextView.getAdapter().getCount() == 0) {
+            fetchAndUpdateSpinner();
+        }
         return true;
     }
 
 
-
-    @Override
+//    @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        currentSelection = position;
-        String selectedItem = (String) parent.getSelectedItem();
-
-
-
-        //FIXME Should live in ViewModel, check in Db first then API
-        if (spinnerTouched) {
-
-            Bundle bundle = new Bundle();
-            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
-            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-
-//            SearchBottomSheetDialogFragment addPhotoBottomDialogFragment =
-//                    SearchBottomSheetDialogFragment.newInstance();
-//            addPhotoBottomDialogFragment.show(getSupportFragmentManager(),
-//                    "search_dialog_fragment");
-
-            fetchAndUpdateIndices(selectedItem);
-        }
-        spinnerTouched = false;
+//        currentSelection = position;
+//        String selectedItem = (String) parent.getSelectedItem();
+//
+//
+//
+//        //FIXME Should live in ViewModel, check in Db first then API
+//        if (spinnerTouched) {
+//
+//            Bundle bundle = new Bundle();
+//            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
+//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+//
+////            SearchBottomSheetDialogFragment addPhotoBottomDialogFragment =
+////                    SearchBottomSheetDialogFragment.newInstance();
+////            addPhotoBottomDialogFragment.show(getSupportFragmentManager(),
+////                    "search_dialog_fragment");
+//
+//            fetchAndUpdateIndices(selectedItem);
+//        }
+//        spinnerTouched = false;
 
 
 //        CustomLiveData liveData = new CustomLiveData(mDB.cityIndicesDao().loadCityByName(sourceCity),
@@ -356,6 +337,39 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 //
 //        LiveData<CityIndices> indices =  Transformations.switchMap(liveData ,
 //                cityRecords -> bindChartingView(cityRecords.first, cityRecords.second));
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+            currentSelection = v.getText().toString();
+
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, currentSelection);
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+            fetchAndUpdateIndices(currentSelection);
+        }
+        return false;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        View autoview = getCurrentFocus();
+        if(autoview != null) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            inputManager.hideSoftInputFromWindow(autoview.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+
+        currentSelection = (String) parent.getItemAtPosition(position);
+        String selectedItem = (String) parent.getItemAtPosition(position);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+
+        fetchAndUpdateIndices(selectedItem);
     }
 
     /**
@@ -376,19 +390,23 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                     } else {
                         selectedCity = cityIndices.getName();
                     }
+                } else {
+                    Toast.makeText(getBaseContext(), "No result for : " + cityName  , Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
         viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean loading) {
-                if(loading) {
+                if (loading) {
                     mLoadingIndicator.setVisibility(View.VISIBLE);
                 } else {
                     mLoadingIndicator.setVisibility(View.GONE);
                     setupSelectedCityFromViewModel(selectedCity);
                 }
-            }});
+            }
+        });
     }
 
     private void setupSelectedCityFromViewModel(String currentCity) {
@@ -401,21 +419,21 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             public void onChanged(@Nullable CityIndices selectedCityIndices) {
                 if (selectedCityIndices != null && sourceCity != null) {
 
-                        mDB.cityIndicesDao().loadCityByName(sourceCity).observe(ComparisonActivity.this, new android.arch.lifecycle.Observer<CityIndices>() {
-                            @Override
-                            public void onChanged(@Nullable CityIndices sourceCityIndices) {
-                                if (selectedCityIndices.getSafetyIndex() != null
-                                        && selectedCityIndices.getClimateIndex() != null
-                                        && sourceCityIndices != null
-                                        && !selectedCity.equals(sourceCity)) {
+                    mDB.cityIndicesDao().loadCityByName(sourceCity).observe(ComparisonActivity.this, new android.arch.lifecycle.Observer<CityIndices>() {
+                        @Override
+                        public void onChanged(@Nullable CityIndices sourceCityIndices) {
+                            if (selectedCityIndices.getSafetyIndex() != null
+                                    && selectedCityIndices.getClimateIndex() != null
+                                    && sourceCityIndices != null
+                                    && !selectedCity.equals(sourceCity)) {
 
-                                    bindChartingView(sourceCityIndices, selectedCityIndices);
+                                bindChartingView(sourceCityIndices, selectedCityIndices);
 
-                                } else {
-                                    clearChartData();
-                                }
+                            } else {
+                                clearChartData();
                             }
-                        });
+                        }
+                    });
                 } else {
                     clearChartData();
                 }
@@ -492,11 +510,13 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         // setting data
 //        seekBarX.setProgress(12);
 //        seekBarY.setProgress(100);
+        Typeface type = Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf");
 
         barChart.setNoDataText(getString(R.string.no_barchart_data_message));
         barChart.setNoDataTextColor(R.color.colorAccent);
+        barChart.setNoDataTextTypeface(type);
         Paint paint = barChart.getPaint(Chart.PAINT_INFO);
-        paint.setTextSize(32f);
+        paint.setTextSize(40f);
 
         Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -578,10 +598,12 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.setEntryLabelTypeface(tfRegular);
         piechart.setEntryLabelTextSize(10f);
 
+        Typeface type = Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf");
         piechart.setNoDataText(getString(R.string.no_piechart_data_message));
         piechart.setNoDataTextColor(R.color.colorAccent);
+        piechart.setNoDataTextTypeface(type);
         Paint paint = piechart.getPaint(Chart.PAINT_INFO);
-        paint.setTextSize(32f);
+        paint.setTextSize(40f);
 
     }
 
@@ -692,11 +714,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     }
 
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        //TODO Do something better
-        parent.setSelection(0);
-    }
+
 
     //FIXME Implement Repository and network bound resource
     private void fetchAndUpdateSpinner() {
@@ -774,7 +792,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.invalidate();
         barChart.invalidate();
     }
-
 
 
 }

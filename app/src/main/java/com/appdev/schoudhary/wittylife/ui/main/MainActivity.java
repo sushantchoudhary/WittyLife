@@ -1,5 +1,6 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
@@ -166,7 +167,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
 //                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
             intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.QOL);
-            startActivity(intentToStartComparisonActivity);
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intentToStartComparisonActivity, bundle);
         });
 
         /**
@@ -177,7 +180,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
 //                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
             intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.COST);
-            startActivity(intentToStartComparisonActivity);
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intentToStartComparisonActivity, bundle);
         });
 
         /**
@@ -188,7 +193,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             Intent intentToStartComparisonActivity = new Intent(MainActivity.this, destinationClass);
 //                intentToStartComparisonActivity.putParcelableArrayListExtra(Intent.EXTRA_TEXT,new ArrayList<>(rankingList));
             intentToStartComparisonActivity.putExtra("RANKING_TYPE", RankingOptions.TRAFFIC);
-            startActivity(intentToStartComparisonActivity);
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+
+            startActivity(intentToStartComparisonActivity, bundle);
         });
     }
 
@@ -398,8 +405,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     }
 
 
-
-
     @Override
     public void onClick(QOLRanking rankingData) {
         Context context = this;
@@ -412,7 +417,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
          */
         RankingUpdateService.startActionUpdateRanking(getApplicationContext(), rankingData);
 
-        startActivity(intentToStartDetailActivity);
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();
+        startActivity(intentToStartDetailActivity, bundle);
     }
 
 }

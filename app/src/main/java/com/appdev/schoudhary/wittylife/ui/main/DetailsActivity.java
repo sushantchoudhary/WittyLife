@@ -1,6 +1,7 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -14,12 +15,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.transition.Slide;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -184,7 +188,9 @@ public class DetailsActivity extends AppCompatActivity {
             Intent intentToStartComparisonActivity = new Intent(DetailsActivity.this, destinationClass);
             String name = (searchResultCityName != null) ? searchResultCityName : rankingData.getCityName();
             intentToStartComparisonActivity.putExtra(Intent.EXTRA_TEXT, name);
-            startActivity(intentToStartComparisonActivity);
+            Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(DetailsActivity.this).toBundle();
+
+            startActivity(intentToStartComparisonActivity, bundle);
         });
 
         searchAgain.setOnClickListener(view -> finish());
@@ -467,6 +473,11 @@ public class DetailsActivity extends AppCompatActivity {
             startActivity(shareIntent);
             return true;
         }
+
+       if (itemId == android.R.id.home) {
+        supportFinishAfterTransition();
+        return true;
+    }
         return super.onOptionsItemSelected(item);
     }
 

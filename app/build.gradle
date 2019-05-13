@@ -17,12 +17,18 @@ repositories {
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    dataBinding {
+        enabled = true
+    }
     signingConfigs {
         config {
-            keyAlias 'upload'
-            keyPassword 'capstone'
-            storeFile file('/Users/schoudhary/Development/WittyLife/app/keystores')
-            storePassword 'capstone'
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+            storeFile file(properties.getProperty('storeFile'))
+            keyAlias properties.getProperty('keyAlias')
+            storePassword properties.getProperty('storePassword')
+            keyPassword properties.getProperty('keyPassword')
+
         }
     }
     compileSdkVersion 28
@@ -37,8 +43,8 @@ android {
     buildTypes {
         debug {
             debuggable true
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField 'String', "ApiKey", Numbeo_ApiKey
             resValue 'string', "api_key", Numbeo_ApiKey

@@ -132,9 +132,9 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
             /**
              * Updating UI from view model
              */
-            if (rankingOption.getRankingOption().equals(RankingOptions.QOL.getRankingOption())) {
+            if (rankingOption != null && rankingOption.getRankingOption().equals(RankingOptions.QOL.getRankingOption())) {
                 setupRankingFromViewModel();
-            } else if (rankingOption.getRankingOption().equals(RankingOptions.COST.getRankingOption())) {
+            } else if (rankingOption != null && rankingOption.getRankingOption().equals(RankingOptions.COST.getRankingOption())) {
                 setupCostRankingFromViewModel();
             } else {
                 setupTrafficRankingFromViewModel();
@@ -175,6 +175,7 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
         if (rankingData.size() == 0) {
             showErrorMessage();
+            return;
         }
 
         ranking_header_index.setText(R.string.ranking_qolindex);
@@ -199,6 +200,7 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
         if (rankingData.size() == 0) {
             showErrorMessage();
+            return;
         }
 
         ranking_header_index.setText(getString(R.string.groceries_index));
@@ -223,6 +225,8 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
         if (rankingData.size() == 0) {
             showErrorMessage();
+            return;
+
         }
 
         ranking_header_index.setText(getString(R.string.co2_emission));

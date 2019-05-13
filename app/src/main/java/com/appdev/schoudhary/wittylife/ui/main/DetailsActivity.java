@@ -2,10 +2,12 @@ package com.appdev.schoudhary.wittylife.ui.main;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
@@ -32,6 +34,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.SuggestionProvider;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.databinding.ActivityDetailsBinding;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.viewmodel.CityIndicesViewModel;
@@ -98,11 +101,16 @@ public class DetailsActivity extends AppCompatActivity {
 
     private LottieAnimationView lottieAnimationView;
 
+    private ActivityDetailsBinding binding;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
+        binding.setLifecycleOwner(this);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -110,41 +118,50 @@ public class DetailsActivity extends AppCompatActivity {
         mShimmerMinContainer = findViewById(R.id.shimmer_min_container);
         mShimmerMaxContainer = findViewById(R.id.shimmer_max_container);
 
-        detailsLayout = findViewById(R.id.details_layout);
+        detailsLayout = binding.detailsLayout;
 
-        mDetailHeader = findViewById(R.id.detail_header);
-        mPPIValue = findViewById(R.id.ppi_value);
-        mSafetyValue = findViewById(R.id.safety_value);
-        mHealthValue = findViewById(R.id.healthcare_value);
-        mClimateValue = findViewById(R.id.climate_value);
-        mMinContribValue = findViewById(R.id.destination_min_contrib);
-        mMaxContribValue = findViewById(R.id.destination_max_contrib);
+        mDetailHeader = binding.detailHeader;
 
-        mMinContribText = findViewById(R.id.min_contrib_text);
-        mMaxContribText = findViewById(R.id.max_contrib_text);
+        mPPIValue = binding.ppiValue;
 
-        headerDivider = findViewById(R.id.detail_divider_main);
-        footerDivider = findViewById(R.id.detail_divider_footer);
+        mSafetyValue = binding.safetyValue;
 
-        floatingActionButton = findViewById(R.id.compare_fab);
+        mHealthValue = binding.healthcareValue;
 
-//        lottieAnimationView = findViewById(R.id.animation_view);
+        mClimateValue = binding.climateValue;
 
-        tableLayout = findViewById(R.id.tableLayout);
+        mMinContribValue = binding.destinationMinContrib;
+
+        mMaxContribValue = binding.destinationMaxContrib;
+
+        mMinContribText = binding.minContribText;
+
+        mMaxContribText = binding.maxContribText;
+
+        headerDivider = binding.detailDividerMain;
+
+        footerDivider = binding.detailDividerFooter;
+
+        floatingActionButton = binding.compareFab;
+
+        tableLayout = binding.tableLayout;
+
+        mPPiCircleView = binding.ppiCircleView;
+
+        mSafetyCircleView = binding.safetyCircleView;
+
+        mHealthCircleView = binding.healthCircleView;
+
+        mClimateCircleView = binding.climateCircleView;
+
+        mLoadingIndicator = binding.pbLoadingIndicator;
 
         searchAgain = findViewById(R.id.empty_state_header);
         emptyStateView = findViewById(R.id.empty_state_view);
-
-
-        mPPiCircleView = findViewById(R.id.ppiCircleView);
-        mSafetyCircleView = findViewById(R.id.safetyCircleView);
-        mHealthCircleView = findViewById(R.id.healthCircleView);
-        mClimateCircleView = findViewById(R.id.climateCircleView);
+        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
-        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
 
 
         // Check for existing state after configuration change and restore the layout
@@ -311,7 +328,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
         contribDataViewModel.getIsLoading().observe(this, loading -> {
-            if(loading) {
+            if(loading != null && loading) {
                 mShimmerMinContainer.startShimmer();
                 mShimmerMaxContainer.startShimmer();
             } else if (contribData != null){
@@ -359,8 +376,6 @@ public class DetailsActivity extends AppCompatActivity {
             //use the query to search your data somehow
 
             bindSearchUI(searchResultCityName);
-
-
         }
     }
 
@@ -385,7 +400,6 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
-    //FIXME Move this to view model
     private void fetchAndUpdateIndicesFromViewModel(String cityName) {
 
         final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
@@ -402,13 +416,15 @@ public class DetailsActivity extends AppCompatActivity {
                             cityIndices.getTrafficTimeIndex(),
                             cityIndices.getPollutionIndex(),
                             cityIndices.getClimateIndex());
+                } else {
+                    showErrorMessage();
                 }
             }
         });
         viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean loading) {
-                if(loading) {
+                if(loading != null && loading) {
                     mLoadingIndicator.setVisibility(View.VISIBLE);
                 } else {
                     mLoadingIndicator.setVisibility(View.GONE);
@@ -515,6 +531,13 @@ public class DetailsActivity extends AppCompatActivity {
         mShimmerMinContainer.stopShimmer();
         mShimmerMaxContainer.stopShimmer();
         super.onPause();
+    }
+
+    private void showErrorMessage() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.network_error)
+                .setMessage(R.string.network_error_msg)
+                .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
 
 }

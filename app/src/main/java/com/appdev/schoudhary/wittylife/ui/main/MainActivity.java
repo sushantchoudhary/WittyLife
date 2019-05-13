@@ -9,9 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +33,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -49,12 +55,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.disposables.CompositeDisposable;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
+
 
 public class MainActivity extends AppCompatActivity implements MainActivityAdapter.MainActivityAdapterOnClickHandler {
 
     private static final Integer SPAN_COUNT = 2;
     private static final String TAG = MainActivity.class.getSimpleName();
     private List<QOLRanking> mQOLList;
+    private TextView qolMessage;
 
     private SearchView searchView;
     private ImageView qolranking;
@@ -77,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     private CompositeDisposable disposables = new CompositeDisposable();
 
     final AtomicReference<Boolean> validCity = new AtomicReference<>(false);
+    private Boolean set =  false;
+
 
 
     @Override
@@ -85,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+
 
         parentLayout = findViewById(R.id.mainactivity_layout);
         // Bring focus back from SearchView to activity layout
@@ -105,14 +119,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
+
+        gridLayoutManager.setItemPrefetchEnabled(false);
+
+
         mDestinationLayout.setLayoutManager(gridLayoutManager);
+//        mDestinationLayout.setLayoutTransition(null);
+//        mDestinationLayout.setItemAnimator(null);
+
 
         mDestinationLayout.setHasFixedSize(true);
+
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+//        addAnimationOperations();
 
         showRankingGridView();
         setupRankingView();
@@ -123,6 +147,51 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             setupMainViewModel();
         }
     }
+
+    private void addAnimationOperations() {
+
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(parentLayout);
+
+        ConstraintSet constraintSet1 = new ConstraintSet();
+
+        constraintSet1.clone(this, R.layout.main_activity_alt);
+
+        mDestinationLayout.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int state) {
+                super.onScrollStateChanged(recyclerView, state);
+                boolean hasStarted = state == SCROLL_STATE_DRAGGING;
+                boolean hasEnded = state == SCROLL_STATE_IDLE;
+                if(state == RecyclerView.SCROLL_STATE_IDLE){
+                    Log.d(TAG, "State idle");
+                } else if (state == RecyclerView.SCROLL_STATE_SETTLING) {
+                    Log.d(TAG, "State settling");
+                } else  if(state == SCROLL_STATE_DRAGGING) {
+                    Log.d(TAG, "State dragging");
+                }
+
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) {
+                    Log.d(TAG, "Scrolling up");
+
+                    TransitionManager.beginDelayedTransition(parentLayout);
+
+                    ConstraintSet constraintSet2 = set ? constraintSet1 : constraintSet;
+                    constraintSet2.applyTo(parentLayout);
+                    set = !set;
+                }  else {
+                    Log.d(TAG, "Scrolling down");
+                }
+
+            }
+        });
+    }
+
 
     private void setupMainViewModel() {
         setRankingsClickListener();
@@ -142,9 +211,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             AppExecutors.getInstance().diskIO().execute(() -> {
                 rankingList = mDB.qolDao().loadQOlRank();
                 rankingList.observe(this, qolRankings -> {
-                    if(qolRankings != null && qolRankings.size() == 10 &&
+                    if(qolRankings != null && qolRankings.size() == 20 &&
                             destinationUrls != null &&
-                            destinationUrls.size() == 10) {
+                            destinationUrls.size() == 20) {
                         mainActivityAdapter = new MainActivityAdapter(qolRankings, destinationUrls, MainActivity.this);
                         mDestinationLayout.setAdapter(mainActivityAdapter);
                     }
@@ -172,6 +241,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             startActivity(intentToStartComparisonActivity, bundle);
         });
 
+        findViewById(R.id.qol_message).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.qolranking).performClick();
+            }
+        });
+
         /**
          * Set intent to launch RankingActivity on selecting Cost of living ranking image
          */
@@ -185,6 +261,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             startActivity(intentToStartComparisonActivity, bundle);
         });
 
+        findViewById(R.id.cost_message).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.costofliving).performClick();
+            }
+        });
+
         /**
          * Set intent to launch RankingActivity on selecting Traffic ranking image
          */
@@ -196,6 +279,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
             Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
 
             startActivity(intentToStartComparisonActivity, bundle);
+        });
+
+        findViewById(R.id.traffic_message).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.traffic).performClick();
+            }
         });
     }
 

@@ -3,12 +3,15 @@ package com.appdev.schoudhary.wittylife.ui.main;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.card.MaterialCardView;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.appdev.schoudhary.wittylife.R;
@@ -34,6 +37,11 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         this.mQOLRanking = mQOLRanking;
         this.mainActivityAdapterOnClickHandler = mainActivityAdapterOnClickHandler;
 
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     @NonNull
@@ -105,7 +113,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         if (null == mResultList) {
             return 0;
         }
-        return 10;
+        return 20;
     }
 
     public void setDestinationData(List<Urls> urls) {
@@ -121,16 +129,24 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
     public class MainActivityAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView mDestinationImageView;
         final TextView mDestinationCity;
-//        final TextView mDestinationUrl;
+        final LinearLayout mDestinationUrl;
 
 
         MainActivityAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             mDestinationImageView = itemView.findViewById(R.id.destination_item);
             mDestinationCity= itemView.findViewById(R.id.destination_city);
-//            mDestinationUrl= itemView.findViewById(R.id.destination_url);
+            mDestinationUrl= itemView.findViewById(R.id.destination_container);
 
             mDestinationImageView.setOnClickListener(this);
+
+            mDestinationCity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDestinationImageView.performClick();
+                }
+            });
+
         }
 
         @Override

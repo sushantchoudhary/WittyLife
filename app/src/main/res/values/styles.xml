@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="toolbarStyle">@style/AppThemeToolbar</item>
         <item name="searchViewStyle">@style/WittySearchView</item>
+        <!--<item name="android:windowBackground">@color/background</item>-->
+
         <!--<item name="autoCompleteTextViewStyle">@style/cursorColor</item>-->
 
         <item name="android:windowExitTransition">

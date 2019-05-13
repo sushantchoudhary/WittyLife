@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView android:id="@+id/witty_life_scrollview"
-            xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-    <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+>
+    <data>
+    </data>
+<ScrollView android:id="@+id/witty_life_scrollview"
+            xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            tools:context=".ui.main.DetailsActivity"
+>
+
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".ui.main.DetailsActivity"
     android:id="@+id/details_layout"
     android:animateLayoutChanges="true">
 
@@ -487,3 +488,4 @@
 
 
 </ScrollView>
+</layout>

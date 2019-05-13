@@ -70,7 +70,10 @@
                 >
                     <LinearLayout android:layout_width="match_parent"
                                   android:layout_height="match_parent"
-                                  android:orientation="vertical">
+                                  android:orientation="vertical"
+                    android:id="@+id/qol_container"
+                    android:clickable="true"
+                    android:focusable="true">
                         <ImageView
                             android:id="@+id/qolranking"
                             android:layout_width="match_parent"
@@ -93,6 +96,9 @@
                             android:text="@string/qol_message"
                             android:textAlignment="center"
                             android:textSize="16sp"
+                            android:id="@+id/qol_message"
+                            android:clickable="true"
+                            android:focusable="true"
                         />
 
                     </LinearLayout>
@@ -131,7 +137,9 @@
                             android:text="@string/cost_message"
                             android:textAlignment="center"
                             android:textSize="16sp"
-
+                            android:id="@+id/cost_message"
+                            android:clickable="true"
+                            android:focusable="true"
                         />
 
                     </LinearLayout>
@@ -172,7 +180,9 @@
                             android:text="@string/traffic_message"
                             android:textAlignment="center"
                             android:textSize="16sp"
-
+                            android:id="@+id/traffic_message"
+                            android:clickable="true"
+                            android:focusable="true"
                         />
 
                     </LinearLayout>

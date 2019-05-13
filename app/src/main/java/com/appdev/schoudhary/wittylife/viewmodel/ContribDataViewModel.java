@@ -11,7 +11,7 @@ public class ContribDataViewModel extends ViewModel {
     private final String cityName;
     private static ContributionDataRepository dataRepository;
 
-    Pair<Integer, Integer> contribData = new Pair<>(0,0);
+    Pair<Integer, Integer> contribData = new     Pair<>(0,0);
 
     public ContribDataViewModel(String destination) {
         cityName = destination;

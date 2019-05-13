@@ -58,7 +58,7 @@ public class RankingRepository {
 
             isLoading.postValue(true);
 
-            callnumbeo.flatMapIterable(it -> it).take(10)
+            callnumbeo.flatMapIterable(it -> it).take(20)
                     .flatMap(qolRanking -> {
 
 //                        AppExecutors.getInstance().diskIO().execute(() -> mDB.runInTransaction(() -> {

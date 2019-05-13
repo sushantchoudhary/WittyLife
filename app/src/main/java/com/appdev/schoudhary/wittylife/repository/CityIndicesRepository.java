@@ -1,5 +1,6 @@
 package com.appdev.schoudhary.wittylife.repository;
 
+import android.app.AlertDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
@@ -65,6 +66,7 @@ public class CityIndicesRepository {
                             isLoading.setValue(false);
                         }, throwable -> {
                             isLoading.setValue(false);
+                        cityIndicesMutableLiveData.setValue(null);
                             Log.e(String.valueOf(R.string.app_name), throwable.getMessage());
                         }
                 );

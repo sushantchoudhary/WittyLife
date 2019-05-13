@@ -27,7 +27,6 @@
             @transition/grid_exit
         </item>
 
-
         <item name="android:windowAllowEnterTransitionOverlap">false</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
 

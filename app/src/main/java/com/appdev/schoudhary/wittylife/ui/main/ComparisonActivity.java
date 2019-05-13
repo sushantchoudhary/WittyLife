@@ -689,6 +689,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     @Override
     protected void onPause() {
         disposables.dispose();
+        overridePendingTransition(0, 0);
         super.onPause();
     }
 

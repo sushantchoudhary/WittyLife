@@ -498,7 +498,6 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private Intent createShareRankingIntent() {
-
         String cityName = (searchResultCityName != null) ? searchResultCityName : rankingData.getCityName();
 
         return Intent.createChooser(ShareCompat.IntentBuilder.from(this)
@@ -540,4 +539,10 @@ public class DetailsActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.error_dismiss_button, (dialog, which) -> dialog.dismiss()).create().show();
     }
 
+
+    @Override
+    public void onBackPressed() {
+        overridePendingTransition(0, 0);
+        super.onBackPressed();
+    }
 }

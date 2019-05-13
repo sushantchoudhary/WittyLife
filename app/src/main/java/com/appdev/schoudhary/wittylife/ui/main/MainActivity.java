@@ -1,5 +1,6 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.arch.lifecycle.LiveData;
@@ -9,13 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
-import android.support.transition.Transition;
 import android.support.transition.TransitionManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,10 +29,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -146,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         } else {
             setupMainViewModel();
         }
+
+        clearSearchViewFocusOnTouch();
     }
 
     private void addAnimationOperations() {
@@ -170,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
                 } else  if(state == SCROLL_STATE_DRAGGING) {
                     Log.d(TAG, "State dragging");
                 }
-
             }
 
             @Override
@@ -317,9 +317,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         searchView.setQueryRefinementEnabled(true);
 
         //To remove whiteline under the search view widget
-        int searchPlateId = getApplicationContext().getResources().getIdentifier("android:id/search_plate", null, null);
-        ViewGroup viewGroup = searchView.findViewById(searchPlateId);
-        viewGroup.setBackgroundColor(Color.TRANSPARENT);
+//        int searchPlateId = getApplicationContext().getResources().getIdentifier("android:id/search_plate", null, null);
+//        ViewGroup viewGroup = searchView.findViewById(searchPlateId);
+//        viewGroup.setBackgroundColor(Color.TRANSPARENT);
 
         //To remove whiteline under the search view submit button
         int searchSubmitId = getApplicationContext().getResources().getIdentifier("android:id/submit_area", null, null);
@@ -431,25 +431,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         }
     }
 
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            View v = getCurrentFocus();
-            if ( v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
-                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                }
-            }
-        }
-        return super.dispatchTouchEvent( event );
-    }
-
-
     private void setupRankingView() {
         Picasso.with(this)
                 .load(R.drawable.larmrmah216854unsplash)
@@ -511,4 +492,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         startActivity(intentToStartDetailActivity, bundle);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    // Workaround to dismiss keyboard without disabling searchView submit
+    // button when user click outside the app bar
+    private void clearSearchViewFocusOnTouch() {
+        parentLayout.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                View view = getCurrentFocus();
+                if ( view instanceof EditText && !(v instanceof Button)) {
+                    Rect outRect = new Rect();
+                    view.getGlobalVisibleRect(outRect);
+                    if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                        view.clearFocus();
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+            return false;
+        });
+    }
 }

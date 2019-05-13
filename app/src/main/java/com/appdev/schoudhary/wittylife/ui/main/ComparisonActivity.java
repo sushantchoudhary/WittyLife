@@ -14,16 +14,13 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -211,19 +208,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         if (currentSelection != null) {
             autoTextView.setText(currentSelection);
         }
-
-
-//        autoTextView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                Log.d(TAG, getString(R.string.real_selection));
-//                spinnerTouched = true;
-//                return false;
-//            }
-//        });
-
-
-//        autoTextView.setOnItemSelectedListener(ComparisonActivity.this);
     }
 
     @Override
@@ -255,42 +239,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         autoTextView.setOnItemClickListener(ComparisonActivity.this);
         autoTextView.setOnEditorActionListener(ComparisonActivity.this);
 
-
-        /** Setting an action listener */
-//        autoTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-//                    Toast.makeText(getBaseContext(), "Search : " + v.getText(), Toast.LENGTH_SHORT).show();
-//                }
-//                return false;
-//            }
-//        });
-
-//        autoTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//
-//                View autoview = getCurrentFocus();
-//                if(autoview != null) {
-//                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-//
-//                    inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//                }
-//
-//                currentSelection = (String) parent.getItemAtPosition(position);
-//                String selectedItem = (String) parent.getItemAtPosition(position);
-//
-//                Bundle bundle = new Bundle();
-//                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem);
-//                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-//
-//                fetchAndUpdateIndices(selectedItem);
-//
-//            }
-//        });
-
         autoTextItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -308,38 +256,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
             fetchAndUpdateSpinner();
         }
         return true;
-    }
-
-
-//    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        currentSelection = position;
-//        String selectedItem = (String) parent.getSelectedItem();
-//
-//
-//
-//        //FIXME Should live in ViewModel, check in Db first then API
-//        if (spinnerTouched) {
-//
-//            Bundle bundle = new Bundle();
-//            bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, selectedItem );
-//            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-//
-////            SearchBottomSheetDialogFragment addPhotoBottomDialogFragment =
-////                    SearchBottomSheetDialogFragment.newInstance();
-////            addPhotoBottomDialogFragment.show(getSupportFragmentManager(),
-////                    "search_dialog_fragment");
-//
-//            fetchAndUpdateIndices(selectedItem);
-//        }
-//        spinnerTouched = false;
-
-
-//        CustomLiveData liveData = new CustomLiveData(mDB.cityIndicesDao().loadCityByName(sourceCity),
-//                mDB.cityIndicesDao().loadCityByName(selectedCity));
-//
-//        LiveData<CityIndices> indices =  Transformations.switchMap(liveData ,
-//                cityRecords -> bindChartingView(cityRecords.first, cityRecords.second));
     }
 
     @Override
@@ -519,7 +435,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         barChart.setNoDataTextColor(R.color.colorAccent);
         barChart.setNoDataTextTypeface(type);
         Paint paint = barChart.getPaint(Chart.PAINT_INFO);
-        paint.setTextSize(40f);
+        int spSize = 12;
+        float scaledSizeInPixels = spSize * getResources().getDisplayMetrics().scaledDensity;
+        paint.setTextSize(scaledSizeInPixels);
 
         Legend l = barChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -606,7 +524,9 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.setNoDataTextColor(R.color.colorAccent);
         piechart.setNoDataTextTypeface(type);
         Paint paint = piechart.getPaint(Chart.PAINT_INFO);
-        paint.setTextSize(40f);
+        int spSize = 12;
+        float scaledSizeInPixels = spSize * getResources().getDisplayMetrics().scaledDensity;
+        paint.setTextSize(scaledSizeInPixels);
 
     }
 

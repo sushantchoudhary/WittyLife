@@ -31,7 +31,7 @@
         <item name="android:windowAllowEnterTransitionOverlap">false</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
 
-        <item name="android:windowContentTransitions">false</item>
+        <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
 
         <!--<item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>-->

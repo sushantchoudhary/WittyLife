@@ -3,7 +3,7 @@
     <string name="search_title">Search for your destination</string>
     <string name="search_hint">Search destination e.g Sydney</string>
     <string name="goal">Select your ranking criteria</string>
-    <string name="popular_dest_text">Destinations with high QOL ranking</string>
+    <string name="popular_dest_text">Destinations with high quality of life</string>
 
     <string name="qol_message">Quality of life</string>
     <string name="cost_message">Cost of living</string>

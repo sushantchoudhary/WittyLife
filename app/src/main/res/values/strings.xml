@@ -60,5 +60,6 @@
     <string name="co2_emission">Co2 Emission</string>
     <string name="inefficiency">Inefficiency</string>
     <string name="traffic_ranking_title">Top Traffic Ranking..</string>
+    <string name="enter_city_name">Enter city name..</string>
 
 </resources>

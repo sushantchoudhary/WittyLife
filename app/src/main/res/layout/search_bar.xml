@@ -12,7 +12,8 @@
         android:inputType="text"
         android:textCursorDrawable="@drawable/cursor"
         app:backgroundTint="@android:color/white"
-        android:hint="Enter city name.."
+        android:hint="@string/enter_city_name"
+        android:textColorHint="@color/colorPrimaryDark"
 />
 
 </LinearLayout>

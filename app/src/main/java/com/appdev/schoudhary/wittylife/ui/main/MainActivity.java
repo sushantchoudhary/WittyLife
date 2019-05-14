@@ -8,6 +8,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
@@ -40,6 +41,7 @@ import android.widget.Toast;
 
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.databinding.MainActivityBinding;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
 import com.appdev.schoudhary.wittylife.viewmodel.DestinationViewModel;
@@ -88,18 +90,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
     final AtomicReference<Boolean> validCity = new AtomicReference<>(false);
     private Boolean set =  false;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
 
+        final MainActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
+        binding.setLifecycleOwner(this);
 
-
-        parentLayout = findViewById(R.id.mainactivity_layout);
+        parentLayout = binding.mainactivityLayout;
         // Bring focus back from SearchView to activity layout
         parentLayout.requestFocus();
 
@@ -108,34 +107,25 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         Objects.requireNonNull(actionBar).setDisplayShowTitleEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
 
-        qolranking = findViewById(R.id.qolranking);
-        costranking = findViewById(R.id.costofliving);
-        trafficranking = findViewById(R.id.traffic);
-
-        mDestinationLayout = findViewById(R.id.rv_populardestination);
-        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
-        mRankingsLayout = findViewById(R.id.ranking_scrollview);
+        qolranking = binding.qolranking;
+        costranking = binding.costofliving;
+        trafficranking = binding.traffic;
+        mDestinationLayout = binding.rvPopulardestination;
+        mErrorMessageDisplay = binding.tvErrorMessageDisplay;
+        mRankingsLayout = binding.rankingScrollview;
+        mLoadingIndicator = binding.pbLoadingIndicator;
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, SPAN_COUNT,
                 GridLayoutManager.VERTICAL, false);
 
         gridLayoutManager.setItemPrefetchEnabled(false);
 
-
         mDestinationLayout.setLayoutManager(gridLayoutManager);
-//        mDestinationLayout.setLayoutTransition(null);
-//        mDestinationLayout.setItemAnimator(null);
-
-
         mDestinationLayout.setHasFixedSize(true);
 
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-//        addAnimationOperations();
 
         showRankingGridView();
         setupRankingView();
@@ -149,57 +139,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         clearSearchViewFocusOnTouch();
     }
 
-    private void addAnimationOperations() {
-
-        ConstraintSet constraintSet = new ConstraintSet();
-        constraintSet.clone(parentLayout);
-
-        ConstraintSet constraintSet1 = new ConstraintSet();
-
-        constraintSet1.clone(this, R.layout.main_activity_alt);
-
-        mDestinationLayout.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int state) {
-                super.onScrollStateChanged(recyclerView, state);
-                boolean hasStarted = state == SCROLL_STATE_DRAGGING;
-                boolean hasEnded = state == SCROLL_STATE_IDLE;
-                if(state == RecyclerView.SCROLL_STATE_IDLE){
-                    Log.d(TAG, "State idle");
-                } else if (state == RecyclerView.SCROLL_STATE_SETTLING) {
-                    Log.d(TAG, "State settling");
-                } else  if(state == SCROLL_STATE_DRAGGING) {
-                    Log.d(TAG, "State dragging");
-                }
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if(dy > 0) {
-                    Log.d(TAG, "Scrolling up");
-
-                    TransitionManager.beginDelayedTransition(parentLayout);
-
-                    ConstraintSet constraintSet2 = set ? constraintSet1 : constraintSet;
-                    constraintSet2.applyTo(parentLayout);
-                    set = !set;
-                }  else {
-                    Log.d(TAG, "Scrolling down");
-                }
-
-            }
-        });
-    }
-
-
     private void setupMainViewModel() {
         setRankingsClickListener();
 
         DestinationViewModel viewModel = ViewModelProviders.of(this).get(DestinationViewModel.class);
 
         viewModel.getIsLoading().observe(this, loading -> {
-            if(loading) {
+            if(loading != null && loading) {
                 mLoadingIndicator.setVisibility(View.VISIBLE);
             } else {
                 mLoadingIndicator.setVisibility(View.GONE);
@@ -335,9 +281,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.getCause();
         }
-
-        //TODO
-//        searchView.setSuggestionsAdapter();
+        //        searchView.setSuggestionsAdapter();
 
 
         searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
@@ -415,8 +359,9 @@ public class MainActivity extends AppCompatActivity implements MainActivityAdapt
 
     @Override
     protected void onPause() {
-        super.onPause();
         disposables.clear();
+        overridePendingTransition(0, 0);
+        super.onPause();
     }
 
 

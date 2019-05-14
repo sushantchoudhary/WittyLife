@@ -101,15 +101,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     private LottieAnimationView lottieAnimationView;
 
-    private ActivityDetailsBinding binding;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
+        final ActivityDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
         binding.setLifecycleOwner(this);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -244,7 +241,6 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     @SuppressLint("DefaultLocale")
-    //FIXME params could be null, handle empty value in the UI
     private void populateUIFromSearch(@Nonnull Float purchasingPowerInclRentIndex,
                                       @Nonnull Float propertyPriceToIncomeRatio,
                                       @Nonnull Float cpiIndex,

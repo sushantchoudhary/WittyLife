@@ -82,7 +82,6 @@ public class CityIndicesRepository {
         /**
          * Fetch city records data from api
          */
-        //FIXME Long running task, must run as a background service
         callCityRecords.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new io.reactivex.Observer<CityRecords>() {
                     @Override

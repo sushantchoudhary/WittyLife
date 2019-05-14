@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+>
+    <data>
+    </data>
+
 <ScrollView android:id="@+id/witty_life_scrollview"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/mainactivity_layout"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="false"
         android:focusableInTouchMode="true"
-        tools:context=".ui.main.MainActivity">
+        tools:context=".ui.main.MainActivity"
+        android:layoutAnimation="@anim/main_animation">
         <TextView
             android:id="@+id/goal"
             style="@style/Base.TextAppearance.AppCompat.Headline"
@@ -259,4 +261,5 @@
 
 </ScrollView>
 
+</layout>
 

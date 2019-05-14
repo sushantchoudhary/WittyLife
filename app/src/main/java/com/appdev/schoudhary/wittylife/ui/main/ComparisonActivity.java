@@ -177,7 +177,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 //        cityRecords = savedInstanceState.getStringArrayList("cityRecords");
-        //FIXME Use viewmodel to save UI state
         sourceCity = savedInstanceState.getString("sourceCity");
         selectedCity = savedInstanceState.getString("selectedCity");
         currentSelection = savedInstanceState.getString("currentSelection");
@@ -217,7 +216,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //FIXME Update menu icon color to white
         MenuInflater inflater = getMenuInflater();
 
         inflater.inflate(R.menu.autocomplete_spinner, menu);
@@ -636,10 +634,6 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         piechart.invalidate();
     }
 
-
-
-
-    //FIXME Implement Repository and network bound resource
     private void fetchAndUpdateSpinner() {
 
         AppExecutors.getInstance().diskIO().execute(() -> {

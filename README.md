@@ -16,3 +16,14 @@ App uses [Numbeo APIs](https://www.numbeo.com/api/doc.jsp) for showing data on w
 # Gradle Task 
 ## Install app 
 ./gradlew installRelease 
+
+# App Preview
+
+
+<img src="https://github.com/sushantchoudhary/WittyLife/blob/master/MainActivity_WittyLife.jpg" width="200">    <img src="https://github.com/sushantchoudhary/WittyLife/blob/master/Ranking_WittyLife.jpg" width="200">   <img src="https://github.com/sushantchoudhary/WittyLife/blob/master/Details_WittyLife.jpg" width="200">   <img src="https://github.com/sushantchoudhary/WittyLife/blob/master/Comparison_WittyLife.jpg" width="200">
+
+
+
+
+
+

@@ -212,11 +212,13 @@
             android:layout_width="42dp"
             android:layout_gravity="center"
             android:visibility="invisible"
-            app:layout_constraintTop_toTopOf="@+id/populardest_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             android:theme="@style/progressAccent"
+
         />
 
         <TextView

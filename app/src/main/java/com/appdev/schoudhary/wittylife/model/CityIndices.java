@@ -74,9 +74,6 @@ public class CityIndices implements Parcelable
     public final static Parcelable.Creator<CityIndices> CREATOR = new Creator<CityIndices>() {
 
 
-        @SuppressWarnings({
-                "unchecked"
-        })
         public CityIndices createFromParcel(Parcel in) {
             return new CityIndices(in);
         }

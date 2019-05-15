@@ -3,7 +3,6 @@ package com.appdev.schoudhary.wittylife.network;
 import com.appdev.schoudhary.wittylife.model.DestinationImg;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

@@ -4,8 +4,6 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.appdev.schoudhary.wittylife.database.AppDatabase;
-
 public class ContribDataViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     private final String cityName;
 

@@ -71,7 +71,7 @@ public class HealthCareData implements Parcelable
     }
             ;
 
-    protected HealthCareData(Parcel in) {
+    private HealthCareData(Parcel in) {
         this.skillAndCompetency = ((Float) in.readValue((Float.class.getClassLoader())));
         this.cost = ((Float) in.readValue((Float.class.getClassLoader())));
         this.responsivenessWaitings = ((Float) in.readValue((Float.class.getClassLoader())));

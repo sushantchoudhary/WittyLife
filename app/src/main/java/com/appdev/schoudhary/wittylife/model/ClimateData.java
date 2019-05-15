@@ -82,7 +82,7 @@ public class ClimateData implements Parcelable
             ;
 
     @Ignore
-    protected ClimateData(Parcel in) {
+    private ClimateData(Parcel in) {
         this.greenAndParksQuality = ((Float) in.readValue((Float.class.getClassLoader())));
         this.pm25 = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.comfortableToSpendTime = ((Float) in.readValue((Float.class.getClassLoader())));

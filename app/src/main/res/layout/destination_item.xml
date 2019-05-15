@@ -16,7 +16,6 @@
 <!--</ImageView>-->
 
 <android.support.design.card.MaterialCardView
-    android:id="@+id/qol_card"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

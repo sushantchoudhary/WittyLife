@@ -47,11 +47,8 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField 'String', "ApiKey", Numbeo_ApiKey
-            resValue 'string', "api_key", Numbeo_ApiKey
             buildConfigField 'String', "UnsplashApiKey", Unsplash_ApiKey
-            resValue 'string', "unsplash_api_key", Unsplash_ApiKey
             buildConfigField 'String', "FabricApiKey", Fabric_ApiKey
-            resValue 'string', "fabric_api_key", Fabric_ApiKey
         }
         release {
             debuggable false
@@ -59,11 +56,8 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField 'String', "ApiKey", Numbeo_ApiKey
-            resValue 'string', "api_key", Numbeo_ApiKey
             buildConfigField 'String', "UnsplashApiKey", Unsplash_ApiKey
-            resValue 'string', "unsplash_api_key", Unsplash_ApiKey
             buildConfigField 'String', "FabricApiKey", Fabric_ApiKey
-            resValue 'string', "fabric_api_key", Fabric_ApiKey
             signingConfig signingConfigs.config
         }
     }

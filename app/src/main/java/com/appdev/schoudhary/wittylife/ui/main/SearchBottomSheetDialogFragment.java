@@ -31,8 +31,7 @@ public class SearchBottomSheetDialogFragment extends android.support.design.widg
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.bottonsheet_layout, container, false);
 
-            return  view;
+        return inflater.inflate(R.layout.bottonsheet_layout, container, false);
     }
 }

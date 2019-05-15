@@ -1,6 +1,5 @@
 package com.appdev.schoudhary.wittylife.repository;
 
-import android.app.AlertDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
@@ -34,7 +33,7 @@ public class CityIndicesRepository {
 
 
     public final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-    public MutableLiveData<CityIndices> cityIndicesMutableLiveData = new MutableLiveData<>();
+    private MutableLiveData<CityIndices> cityIndicesMutableLiveData = new MutableLiveData<>();
     public MutableLiveData<List<City>> cityListMutableLiveData = new MutableLiveData<>();
 
 

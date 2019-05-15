@@ -28,7 +28,7 @@ public class GridWidgetService extends RemoteViewsService {
 
 class GridViewRemoteViewFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    public static final String TAG = GridViewRemoteViewFactory.class.getSimpleName();
+    private static final String TAG = GridViewRemoteViewFactory.class.getSimpleName();
 
     private Context mContext;
     private static AppDatabase mDB;
@@ -36,7 +36,7 @@ class GridViewRemoteViewFactory implements RemoteViewsService.RemoteViewsFactory
     private List<QOLRanking> qolRankingData;
 
 
-    public GridViewRemoteViewFactory(Context context, Intent intent) {
+    GridViewRemoteViewFactory(Context context, Intent intent) {
         this.mContext = context;
         if (intent != null) {
             if (intent.hasExtra("rankingData")) {

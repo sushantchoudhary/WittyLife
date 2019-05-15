@@ -1,10 +1,10 @@
 package com.appdev.schoudhary.wittylife.ui.main;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.databinding.ActivityComparisonBinding;
 import com.appdev.schoudhary.wittylife.model.City;
 import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.utils.AppExecutors;
@@ -68,15 +69,10 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class ComparisonActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, OnChartValueSelectedListener, TextView.OnEditorActionListener {
     private static final String TAG = ComparisonActivity.class.getSimpleName();
-    private ActionBar actionBar;
     private ProgressBar mLoadingIndicator;
     private AutoCompleteTextView autoTextView;
 
-    private MenuItem autoTextItem;
-
-    private String sourceCity;
-    private String selectedCity;
-    private String currentSelection;
+    private String sourceCity, selectedCity, currentSelection;
 
     private static AppDatabase mDB;
     private List<String> cityRecords;
@@ -86,43 +82,41 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
-    private Typeface tfLight;
-    private Typeface tfRegular;
-
-    private Boolean spinnerTouched = false;
+    private Typeface tfLight, tfRegular;
     private FirebaseAnalytics mFirebaseAnalytics;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comparison);
+
+        final ActivityComparisonBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_comparison);
+        binding.setLifecycleOwner(this);
 
         Toolbar comparetoolbar = findViewById(R.id.toolbar);
         setSupportActionBar(comparetoolbar);
 
-        actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
 
         tfLight = Typeface.createFromAsset(getApplicationContext().getAssets(), "OpenSans-Light.ttf");
         tfRegular = Typeface.createFromAsset(getApplicationContext().getAssets(), "Roboto-Regular.ttf");
 
-        piechart = findViewById(R.id.piechart);
+        piechart = binding.piechart;
 
-        barChart = findViewById(R.id.stackbar);
+        barChart = binding.stackbar;
         barChart.setOnChartValueSelectedListener(this);
 
-        mLoadingIndicator = findViewById(R.id.compare_loading_indicator);
-
-        mDB = AppDatabase.getsInstance(getApplicationContext());
-
-        cityRecords = new ArrayList<>();
+        mLoadingIndicator = binding.compareLoadingIndicator;
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         //FIXME Hack to force onCreateOptionMenu() to load spinner data
         invalidateOptionsMenu();
+
+        mDB = AppDatabase.getsInstance(getApplicationContext());
+        cityRecords = new ArrayList<>();
 
         // Check for existing state after configuration change and restore the layout
         if (savedInstanceState != null) {
@@ -185,7 +179,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     }
 
 
-    private void populateSpinnerFromDB(@Nullable Bundle savedInstanceState) {
+    private void populateSpinnerFromDB() {
         final MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getCityRecords().observe(this, new android.arch.lifecycle.Observer<List<City>>() {
             @Override
@@ -219,7 +213,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         MenuInflater inflater = getMenuInflater();
 
         inflater.inflate(R.menu.autocomplete_spinner, menu);
-        autoTextItem = menu.findItem(R.id.auto_menu);
+        final MenuItem autoTextItem = menu.findItem(R.id.auto_menu);
         View v = autoTextItem.getActionView();
 
         autoTextView = v.findViewById(R.id.auto_complete);
@@ -227,12 +221,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
         autoTextView.setTextColor(getResources().getColor(R.color.icons, null));
 
-        autoTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                autoTextView.showDropDown();
-            }
-        });
+        autoTextView.setOnClickListener(v1 -> autoTextView.showDropDown());
 
         autoTextView.setOnItemClickListener(ComparisonActivity.this);
         autoTextView.setOnEditorActionListener(ComparisonActivity.this);
@@ -313,15 +302,12 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
                 }
             }
         });
-        viewModel.getIsLoading().observe(this, new android.arch.lifecycle.Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean loading) {
-                if (loading) {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                } else {
-                    mLoadingIndicator.setVisibility(View.GONE);
-                    setupSelectedCityFromViewModel(selectedCity);
-                }
+        viewModel.getIsLoading().observe(this, loading -> {
+            if (loading) {
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+            } else {
+                mLoadingIndicator.setVisibility(View.GONE);
+                setupSelectedCityFromViewModel(selectedCity);
             }
         });
     }
@@ -330,30 +316,26 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
         viewModel.loadCity(currentCity);
 
-        viewModel.getCityIndices().observe(this, new android.arch.lifecycle.Observer<CityIndices>() {
-            @SuppressLint("DefaultLocale")
-            @Override
-            public void onChanged(@Nullable CityIndices selectedCityIndices) {
-                if (selectedCityIndices != null && sourceCity != null) {
+        viewModel.getCityIndices().observe(this, selectedCityIndices -> {
+            if (selectedCityIndices != null && sourceCity != null) {
 
-                    mDB.cityIndicesDao().loadCityByName(sourceCity).observe(ComparisonActivity.this, new android.arch.lifecycle.Observer<CityIndices>() {
-                        @Override
-                        public void onChanged(@Nullable CityIndices sourceCityIndices) {
-                            if (selectedCityIndices.getSafetyIndex() != null
-                                    && selectedCityIndices.getClimateIndex() != null
-                                    && sourceCityIndices != null
-                                    && !selectedCity.equals(sourceCity)) {
+                mDB.cityIndicesDao().loadCityByName(sourceCity).observe(ComparisonActivity.this, new android.arch.lifecycle.Observer<CityIndices>() {
+                    @Override
+                    public void onChanged(@Nullable CityIndices sourceCityIndices) {
+                        if (selectedCityIndices.getSafetyIndex() != null
+                                && selectedCityIndices.getClimateIndex() != null
+                                && sourceCityIndices != null
+                                && !selectedCity.equals(sourceCity)) {
 
-                                bindChartingView(sourceCityIndices, selectedCityIndices);
+                            bindChartingView(sourceCityIndices, selectedCityIndices);
 
-                            } else {
-                                clearChartData();
-                            }
+                        } else {
+                            clearChartData();
                         }
-                    });
-                } else {
-                    clearChartData();
-                }
+                    }
+                });
+            } else {
+                clearChartData();
             }
         });
     }
@@ -639,7 +621,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
         AppExecutors.getInstance().diskIO().execute(() -> {
             int count = mDB.cityDao().getRowCount();
             if (count > 0) {
-                populateSpinnerFromDB(null);
+                populateSpinnerFromDB();
             } else {
                 final CityIndicesViewModel viewModel = ViewModelProviders.of(this).get(CityIndicesViewModel.class);
                 viewModel.getCityList().observe(this, new android.arch.lifecycle.Observer<List<City>>() {
@@ -657,11 +639,10 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -676,7 +657,7 @@ public class ComparisonActivity extends AppCompatActivity implements AdapterView
     @Override
     protected void onRestart() {
         super.onRestart();
-        populateSpinnerFromDB(null);
+        populateSpinnerFromDB();
         setupSelectedCityFromViewModel(selectedCity);
     }
 

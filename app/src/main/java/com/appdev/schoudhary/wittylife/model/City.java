@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 @Entity(tableName = "city")
 public class City implements Parcelable
 {
@@ -35,9 +37,6 @@ public class City implements Parcelable
     public final static Parcelable.Creator<City> CREATOR = new Creator<City>() {
 
 
-        @SuppressWarnings({
-                "unchecked"
-        })
         public City createFromParcel(Parcel in) {
             return new City(in);
         }
@@ -54,7 +53,7 @@ public class City implements Parcelable
         this.longitude = ((Float) in.readValue((Float.class.getClassLoader())));
         this.latitude = ((Float) in.readValue((Float.class.getClassLoader())));
         this.country = ((String) in.readValue((String.class.getClassLoader())));
-        this.city = ((String) in.readValue((String.class.getClassLoader())));
+        this.city = ((String) Objects.requireNonNull(in.readValue((String.class.getClassLoader()))));
     }
 
 //    /**

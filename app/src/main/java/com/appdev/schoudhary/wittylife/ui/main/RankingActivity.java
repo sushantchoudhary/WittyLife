@@ -5,17 +5,14 @@ import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Slide;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
@@ -25,6 +22,7 @@ import android.widget.TextView;
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
+import com.appdev.schoudhary.wittylife.databinding.ActivityRankingBinding;
 import com.appdev.schoudhary.wittylife.model.CostRanking;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.TrafficRanking;
@@ -87,37 +85,37 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ranking);
+
+        final ActivityRankingBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_ranking);
+        binding.setLifecycleOwner(this);
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        spinner = findViewById(R.id.rank_selector);
+        spinner = binding.rankSelector;
 
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = binding.pbLoadingIndicator;
+        ranking_header_index = binding.rankingIndex;
+        ranking_header_value = binding.rankingValue;
+
+        topCity = binding.firstCity;
+        secondCity = binding.secondCity;
+        thirdCity = binding.thirdCity;
+        lastCity = binding.lastCity;
+
+        topQol = binding.firstQol;
+        secondQol = binding.secondQol;
+        thirdQol = binding.thirdQol;
+        lastQol = binding.lastQol;
+
+        topPpi = binding.firstPpindex;
+        secondPpi = binding.secondPpi;
+        thirdPpi = binding.thirdPpiindex;
+        lastPpi = binding.lastPpindex;
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
-
-        ranking_header_index = findViewById(R.id.ranking_index);
-        ranking_header_value = findViewById(R.id.ranking_value);
-
-
-        topCity = findViewById(R.id.first_city);
-        secondCity = findViewById(R.id.second_city);
-        thirdCity = findViewById(R.id.third_city);
-        lastCity = findViewById(R.id.last_city);
-
-        topQol = findViewById(R.id.first_qol);
-        secondQol = findViewById(R.id.second_qol);
-        thirdQol = findViewById(R.id.third_qol);
-        lastQol = findViewById(R.id.last_qol);
-
-        topPpi = findViewById(R.id.first_ppindex);
-        secondPpi = findViewById(R.id.second_ppi);
-        thirdPpi = findViewById(R.id.third_ppiindex);
-        lastPpi = findViewById(R.id.last_ppindex);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.rankingFilter, android.R.layout.simple_spinner_item);
@@ -462,11 +460,10 @@ public class RankingActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {
+            supportFinishAfterTransition();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

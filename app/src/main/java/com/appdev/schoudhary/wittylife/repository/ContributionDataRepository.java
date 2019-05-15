@@ -1,15 +1,12 @@
 package com.appdev.schoudhary.wittylife.repository;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.R;
-import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.ClimateData;
 import com.appdev.schoudhary.wittylife.model.CrimeData;
 import com.appdev.schoudhary.wittylife.model.HealthCareData;

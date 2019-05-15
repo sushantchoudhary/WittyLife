@@ -5,7 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Pair;
 
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.City;
@@ -13,7 +12,6 @@ import com.appdev.schoudhary.wittylife.model.CityIndices;
 import com.appdev.schoudhary.wittylife.model.CostRanking;
 import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.TrafficRanking;
-import com.appdev.schoudhary.wittylife.repository.ContributionDataRepository;
 
 import java.util.List;
 

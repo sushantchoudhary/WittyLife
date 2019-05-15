@@ -36,7 +36,7 @@ public class DestinationImg implements Parcelable {
     @Expose
     private List<Result> results = null;
 
-    protected DestinationImg(Parcel in) {
+    private DestinationImg(Parcel in) {
         this.total = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.totalPages = ((Integer) in.readValue((Integer.class.getClassLoader())));
         in.readList(this.results, (com.appdev.schoudhary.wittylife.model.Result.class.getClassLoader()));

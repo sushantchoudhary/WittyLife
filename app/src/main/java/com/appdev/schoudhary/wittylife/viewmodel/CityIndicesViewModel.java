@@ -8,7 +8,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Pair;
 
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
 import com.appdev.schoudhary.wittylife.model.City;

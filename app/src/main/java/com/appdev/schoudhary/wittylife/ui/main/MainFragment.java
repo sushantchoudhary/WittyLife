@@ -14,8 +14,6 @@ import com.appdev.schoudhary.wittylife.viewmodel.MainViewModel;
 
 public class MainFragment extends Fragment {
 
-    private MainViewModel mViewModel;
-
     public static MainFragment newInstance() {
         return new MainFragment();
     }
@@ -30,7 +28,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        final MainViewModel mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
     }
 
 

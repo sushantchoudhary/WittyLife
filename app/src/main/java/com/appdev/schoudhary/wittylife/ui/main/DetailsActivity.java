@@ -17,15 +17,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
-import android.transition.Slide;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -54,50 +51,31 @@ public class DetailsActivity extends AppCompatActivity {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
     private static final String DESTINATION_URL = "https://www.numbeo.com/quality-of-life/in/";
-    private TextView mDetailHeader;
-    private TextView mPPIValue;
-    private TextView mSafetyValue;
-    private TextView mHealthValue;
-    private TextView mClimateValue;
-    private TextView mMinContribValue;
-    private TextView mMaxContribValue;
-
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
-
-    private ConstraintLayout detailsLayout;
-
+    private TextView mDetailHeader, mPPIValue, mSafetyValue, mHealthValue, mClimateValue, mMinContribValue, mMaxContribValue ;
     private TextView mMinContribText;
     private TextView mMaxContribText;
+
+    private ProgressBar mLoadingIndicator;
 
     private Pair<Integer, Integer> contribData = new Pair<>(0, 0);
 
     private FloatingActionButton floatingActionButton;
     private TableLayout tableLayout;
-    private View headerDivider;
-    private View footerDivider;
-
-    private MaterialButton searchAgain;
-    private TextView emptyStateBody;
+    private View headerDivider, footerDivider;
 
     private ConstraintLayout emptyStateView;
-
 
     private static AppDatabase mDB;
 
 
     private QOLRanking rankingData;
-    private CircleProgressView mPPiCircleView;
-    private CircleProgressView mSafetyCircleView;
-    private CircleProgressView mHealthCircleView;
-    private CircleProgressView mClimateCircleView;
+    private CircleProgressView mPPiCircleView, mSafetyCircleView, mHealthCircleView, mClimateCircleView ;
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private ShareActionProvider shareActionProvider;
 
     private String searchResultCityName;
-    private ShimmerFrameLayout mShimmerMinContainer;
-    private ShimmerFrameLayout mShimmerMaxContainer;
+    private ShimmerFrameLayout mShimmerMinContainer, mShimmerMaxContainer;
 
     private LottieAnimationView lottieAnimationView;
 
@@ -115,7 +93,7 @@ public class DetailsActivity extends AppCompatActivity {
         mShimmerMinContainer = findViewById(R.id.shimmer_min_container);
         mShimmerMaxContainer = findViewById(R.id.shimmer_max_container);
 
-        detailsLayout = binding.detailsLayout;
+        final ConstraintLayout detailsLayout = binding.detailsLayout;
 
         mDetailHeader = binding.detailHeader;
 
@@ -153,9 +131,9 @@ public class DetailsActivity extends AppCompatActivity {
 
         mLoadingIndicator = binding.pbLoadingIndicator;
 
-        searchAgain = findViewById(R.id.empty_state_header);
+        final MaterialButton searchAgain = findViewById(R.id.empty_state_header);
         emptyStateView = findViewById(R.id.empty_state_view);
-        mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
+        final TextView mErrorMessageDisplay = findViewById(R.id.tv_error_message_display);
 
         mDB = AppDatabase.getsInstance(getApplicationContext());
 

@@ -3,8 +3,6 @@ package com.appdev.schoudhary.wittylife.ui.main;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.design.card.MaterialCardView;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
 import android.view.LayoutInflater;
@@ -25,7 +23,6 @@ import java.util.List;
 public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.MainActivityAdapterViewHolder> {
 
 
-    private List<Urls> mURLList;
     private List<Result> mResultList;
 
     private List<QOLRanking> mQOLRanking;
@@ -117,7 +114,7 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
     }
 
     public void setDestinationData(List<Urls> urls) {
-        mURLList = urls;
+        final List<Urls> mURLList = urls;
         notifyDataSetChanged();
     }
 

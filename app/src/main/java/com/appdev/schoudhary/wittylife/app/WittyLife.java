@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.util.Log;
 
 import com.appdev.schoudhary.wittylife.BuildConfig;
 import com.appdev.schoudhary.wittylife.database.AppDatabase;
@@ -26,18 +24,9 @@ import retrofit2.Response;
 
 public class WittyLife extends Application {
 
-    private static WittyLife wittyLife;
-    private static Context context;
+    public  WittyLife wittyLife;
+    private Context context;
     private static AppDatabase mDB;
-
-
-    public static WittyLife getMyApplication() {
-        return wittyLife;
-    }
-
-    public static Context getAppContext() {
-        return WittyLife.context;
-    }
 
     @SuppressLint("StaticFieldLeak")
     public void onCreate() {
@@ -47,7 +36,7 @@ public class WittyLife extends Application {
         mDB = AppDatabase.getsInstance(getApplicationContext());
 
         wittyLife = this;
-        WittyLife.context = getApplicationContext();
+        context = getApplicationContext();
 
         initializeStetho();
 

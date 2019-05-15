@@ -36,16 +36,11 @@
     <string name="PP_Index">PP Index</string>
     <string name="compare_title">Compare ranking</string>
     <string name="compare_with_city">Compare with city</string>
-    <string name="no_data_error">No data available</string>
-    <string name="no_data_error_msg">We don\'t have sufficient comparison data for this city. Please
-        select another city.
-    </string>
     <string name="no_match_message">We tried but couldn\'t find a matching city, please search for
         another city
     </string>
     <string name="wittylife_widget">Wittylife Widget</string>
     <string name="empty_view_text">No ranking data found</string>
-    <string name="real_selection">Real value selected in spinner</string>
     <string name="bar_chart_description">Climate Index</string>
     <string name="no_barchart_data_message">No climate data available for comparison</string>
     <string name="piechart_descripttion">Safety Rating</string>
@@ -61,5 +56,9 @@
     <string name="inefficiency">Inefficiency</string>
     <string name="traffic_ranking_title">Top Traffic Ranking..</string>
     <string name="enter_city_name">Enter city name..</string>
+    <string name="empty_state_message">Not enough ranking data for this city</string>
+    <string name="search_again">Search again..</string>
+    <string name="empty_value">xx.xx</string>
+    <string name="select_city_for_comparison">Select city for comparison</string>
 
 </resources>

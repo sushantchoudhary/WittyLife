@@ -6,13 +6,9 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.appdev.schoudhary.wittylife.database.AppDatabase;
-import com.appdev.schoudhary.wittylife.model.QOLRanking;
 import com.appdev.schoudhary.wittylife.model.Result;
-import com.appdev.schoudhary.wittylife.model.Urls;
 import com.appdev.schoudhary.wittylife.repository.RankingRepository;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class DestinationViewModel extends AndroidViewModel {

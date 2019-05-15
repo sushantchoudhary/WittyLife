@@ -65,10 +65,6 @@
         <!-- <item name="colorPrimaryDark">@android:color/white</item> -->
     </style>
 
-    <style name="cursorColor" parent="Widget.AppCompat.AutoCompleteTextView">
-        <item name="android:textCursorDrawable">@drawable/cursor</item>
-    </style>
-
 
     <!-- set the rounded drawable as background to your bottom sheet -->
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
@@ -80,13 +76,6 @@
         <item name="bottomSheetStyle">@style/BottomSheet</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/white</item>
-    </style>
-
-    <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
-        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
-        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
-        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
 
 </resources>
